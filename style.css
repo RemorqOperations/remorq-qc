@@ -9,8 +9,7 @@ html, body {
   font-family: Inter, Arial, sans-serif;
   background:
     background:
-      radial-gradient(circle at top, #1d4ed8 0%, #0f172a 45%, #09101d 100%);
-  color: #ffffff;
+      radial-gradient(circle at top, #63F58E 0%, #1bbf6b 40%, #0f3b2c 100%);  color: #ffffff;
 }
 
 body.mobile-app {
