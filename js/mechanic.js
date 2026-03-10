@@ -220,7 +220,6 @@ async function loadMechanicDashboard() {
     });
 
     if (!response.success) {
-      console.error(response.message || "Erreur dashboard");
       renderDashboard({
         validated: 0,
         pending: 0,
