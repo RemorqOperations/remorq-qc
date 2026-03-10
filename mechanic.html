@@ -2,62 +2,68 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Dashboard Mécano</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="app-body">
-  <div class="app-shell">
-    <header class="topbar">
+<body class="mobile-app">
+  <div class="mobile-shell">
+
+    <header class="mobile-header">
       <div>
-        <p class="topbar-label">Remorq QC</p>
-        <h1 class="topbar-title">Dashboard Mécano</h1>
+        <p class="app-kicker">Remorq QC</p>
+        <h1 class="app-title">Dashboard mécano</h1>
       </div>
-      <button class="icon-btn" onclick="logout()">Déconnexion</button>
+      <button class="logout-btn" onclick="logout()">Quitter</button>
     </header>
 
-    <section class="welcome-card">
-      <p class="muted">Bienvenue</p>
-      <h2 id="userName">Mécano</h2>
-      <p class="muted">Suivi des réparations du jour</p>
-    </section>
-
-    <section class="hero-counter">
-      <p class="counter-label">Vélos validés aujourd’hui</p>
-      <div class="hero-number" id="validatedCount">0</div>
-    </section>
-
-    <section class="mini-grid">
-      <div class="mini-card">
-        <p class="mini-label">À contrôler</p>
-        <div class="mini-number" id="pendingCount">0</div>
-      </div>
-
-      <div class="mini-card">
-        <p class="mini-label">Retournés aujourd’hui</p>
-        <div class="mini-number" id="returnedCount">0</div>
+    <section class="profile-card">
+      <div class="avatar-circle" id="userAvatar">M</div>
+      <div class="profile-info">
+        <p class="profile-label">Connecté</p>
+        <h2 id="userName">Mécano</h2>
       </div>
     </section>
 
-    <section class="actions">
-      <button class="btn btn-primary btn-large" onclick="openScanner()">
+    <section class="main-counter-card">
+      <p class="main-counter-label">Vélos validés aujourd’hui</p>
+      <div class="main-counter-wrap">
+        <div class="main-counter-number" id="validatedCount">0</div>
+      </div>
+    </section>
+
+    <section class="stats-row">
+      <div class="stat-card">
+        <p class="stat-title">À contrôler</p>
+        <div class="stat-value" id="pendingCount">0</div>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Retournés</p>
+        <div class="stat-value" id="returnedCount">0</div>
+      </div>
+    </section>
+
+    <section class="action-zone">
+      <button class="primary-action" onclick="openScanner()">
         Scanner un vélo réparé
       </button>
 
-      <button class="btn btn-secondary" onclick="refreshDashboard()">
+      <button class="secondary-action" onclick="refreshDashboard()">
         Actualiser
       </button>
     </section>
 
-    <section class="recent-card">
-      <div class="section-head">
+    <section class="history-card">
+      <div class="history-head">
         <h3>Derniers scans</h3>
       </div>
 
-      <div id="recentList" class="recent-list">
+      <div id="recentList" class="history-list">
         <div class="empty-state">Aucun scan pour le moment</div>
       </div>
     </section>
+
   </div>
 
   <script src="js/mechanic.js"></script>
