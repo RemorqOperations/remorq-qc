@@ -7,9 +7,8 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: Inter, Arial, sans-serif;
-  background:
-    background:
-      radial-gradient(circle at top, #63F58E 0%, #1bbf6b 40%, #0f3b2c 100%);  color: #ffffff;
+  background: radial-gradient(circle at top, #63F58E 0%, #1bbf6b 40%, #0f3b2c 100%);
+  color: #ffffff;
 }
 
 body.mobile-app {
@@ -77,7 +76,8 @@ body.mobile-app {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  background: linear-gradient(135deg, #63F58E, #30d977);
+  color: #063d21;
   font-size: 22px;
   font-weight: 800;
   flex-shrink: 0;
@@ -98,7 +98,7 @@ body.mobile-app {
 .main-counter-card {
   padding: 20px 18px 24px;
   border-radius: 28px;
-  background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #eafff1 100%);
   color: #0f172a;
   box-shadow: 0 18px 45px rgba(0,0,0,0.25);
   margin-bottom: 16px;
@@ -175,9 +175,9 @@ body.mobile-app {
 }
 
 .primary-action {
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  color: white;
-  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.35);
+  background: linear-gradient(135deg, #63F58E, #3ddc73);
+  color: #063d21;
+  box-shadow: 0 14px 28px rgba(99, 245, 142, 0.35);
 }
 
 .secondary-action {
@@ -262,6 +262,35 @@ body.mobile-app {
   font-size: 14px;
   color: rgba(255,255,255,0.72);
   background: rgba(255,255,255,0.06);
+}
+
+.login-card {
+  padding-top: 24px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  border: 1px solid #d1f5dc;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 16px;
+  outline: none;
+}
+
+.login-input:focus {
+  border-color: #63F58E;
+  box-shadow: 0 0 0 3px rgba(99, 245, 142, 0.18);
+}
+
+.login-error {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #b42318;
+  text-align: center;
+  min-height: 20px;
 }
 
 @media (max-width: 420px) {
