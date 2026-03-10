@@ -1,0 +1,1 @@
+const API_URL = "COLLE_ICI_URL_APPS_SCRIPT";
