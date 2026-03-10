@@ -22,6 +22,8 @@ async function openScanner() {
   const status = document.getElementById("scanStatus");
 
   modal.classList.remove("hidden");
+  clearScannerSuccessUI();
+
   status.className = "scan-status";
   status.innerText = "Ouverture caméra...";
 
@@ -133,6 +135,7 @@ async function closeScanner() {
   }
 
   scanLocked = false;
+  clearScannerSuccessUI();
   modal.classList.add("hidden");
   status.className = "scan-status";
   status.innerText = "Caméra en attente...";
@@ -176,6 +179,9 @@ async function onScanSuccess(decodedText) {
       return;
     }
 
+    playSuccessBeep();
+    flashScannerSuccess();
+
     if (navigator.vibrate) {
       navigator.vibrate(120);
     }
@@ -187,7 +193,7 @@ async function onScanSuccess(decodedText) {
 
     setTimeout(async () => {
       await closeScanner();
-    }, 350);
+    }, 450);
 
   } catch (error) {
     console.error(error);
@@ -310,13 +316,60 @@ function apiJsonp(action, params = {}) {
     function cleanup() {
       try {
         delete window[callbackName];
-      } catch (e) {
-      }
+      } catch (e) {}
       if (script.parentNode) {
         script.parentNode.removeChild(script);
       }
     }
   });
+}
+
+function flashScannerSuccess() {
+  const modal = document.getElementById("scannerModal");
+  const sheet = modal.querySelector(".scanner-sheet");
+  const readerBox = document.getElementById("qr-reader");
+
+  modal.classList.add("scan-success");
+  sheet.classList.add("scan-success");
+  readerBox.classList.add("scan-success");
+}
+
+function clearScannerSuccessUI() {
+  const modal = document.getElementById("scannerModal");
+  if (!modal) return;
+
+  const sheet = modal.querySelector(".scanner-sheet");
+  const readerBox = document.getElementById("qr-reader");
+
+  modal.classList.remove("scan-success");
+  if (sheet) sheet.classList.remove("scan-success");
+  if (readerBox) readerBox.classList.remove("scan-success");
+}
+
+function playSuccessBeep() {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    const audioCtx = new AudioContextClass();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(1046, audioCtx.currentTime);
+
+    gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.14);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.14);
+  } catch (e) {
+    console.log("Bip non disponible");
+  }
 }
 
 function escapeHtml(value) {
