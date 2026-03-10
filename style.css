@@ -403,6 +403,64 @@ border:1px solid #d1f5dc;
 
 background:#ffffff;
 
+.stats-grid-2x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.decision-card {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  margin-bottom: 14px;
+}
+
+.decision-label {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  color: rgba(255,255,255,0.68);
+}
+
+.decision-value {
+  margin: 0 0 14px 0;
+  font-size: 30px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.decision-subvalue {
+  margin: 0 0 14px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.decision-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.decision-textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.danger-action {
+  width: 100%;
+  border: 0;
+  border-radius: 20px;
+  min-height: 58px;
+  padding: 16px 18px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff6b6b, #ef4444);
+  color: white;
+  box-shadow: 0 14px 28px rgba(239, 68, 68, 0.25);
+}
+
 color:#0f172a;
 
 font-size:16px;
