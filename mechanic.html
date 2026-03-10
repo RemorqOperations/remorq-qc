@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Dashboard Mécano</title>
-  <link rel="stylesheet" href="./style.css?v=4" />
+  <link rel="stylesheet" href="./style.css?v=8" />
 </head>
 <body class="mobile-app">
   <div class="mobile-shell">
@@ -63,9 +63,26 @@
         <div class="empty-state">Aucun scan pour le moment</div>
       </div>
     </section>
-
   </div>
 
+  <div id="scannerModal" class="scanner-modal hidden">
+    <div class="scanner-sheet">
+      <div class="scanner-head">
+        <h3>Scanner un vélo</h3>
+        <button class="scanner-close" onclick="closeScanner()">Fermer</button>
+      </div>
+
+      <p class="scanner-help">
+        Place le QR code Lime dans le cadre.
+      </p>
+
+      <div id="qr-reader" class="qr-reader-box"></div>
+
+      <div id="scanStatus" class="scan-status">Caméra en attente...</div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="./js/mechanic.js"></script>
 </body>
 </html>
