@@ -2,21 +2,143 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Dashboard Responsable</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="./style.css?v=12" />
 </head>
-<body>
-  <div class="container">
-    <div class="card">
-      <h1>Dashboard Responsable</h1>
-      <p>Bienvenue <span id="userName"></span></p>
-      <p>Page responsable prête.</p>
+<body class="mobile-app">
+  <div class="mobile-shell">
+
+    <header class="mobile-header">
+      <div>
+        <p class="app-kicker">Remorq QC</p>
+        <h1 class="app-title">Dashboard responsable</h1>
+      </div>
+      <button class="logout-btn" onclick="logout()">Quitter</button>
+    </header>
+
+    <section class="profile-card">
+      <div class="avatar-circle" id="userAvatar">R</div>
+      <div class="profile-info">
+        <p class="profile-label">Connecté</p>
+        <h2 id="userName">Responsable</h2>
+      </div>
+    </section>
+
+    <section class="main-counter-card">
+      <p class="main-counter-label">Total contrôlés aujourd’hui</p>
+      <div class="main-counter-wrap">
+        <div class="main-counter-number" id="controlledCount">0</div>
+      </div>
+    </section>
+
+    <section class="stats-grid-2x2">
+      <div class="stat-card">
+        <p class="stat-title">À contrôler</p>
+        <div class="stat-value" id="pendingCount">0</div>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Validés</p>
+        <div class="stat-value" id="validatedCount">0</div>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Retournés</p>
+        <div class="stat-value" id="returnedCount">0</div>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Mécanos actifs</p>
+        <div class="stat-value" id="mechanicsCount">0</div>
+      </div>
+    </section>
+
+    <section class="action-zone">
+      <button class="primary-action" onclick="openScanner()">
+        Scanner pour contrôle
+      </button>
+
+      <button class="secondary-action" onclick="refreshDashboard()">
+        Actualiser
+      </button>
+    </section>
+
+    <section class="history-card">
+      <div class="history-head">
+        <h3>Production par mécano</h3>
+      </div>
+      <div id="mechanicStatsList" class="history-list">
+        <div class="empty-state">Aucune donnée pour le moment</div>
+      </div>
+    </section>
+
+    <section class="history-card">
+      <div class="history-head">
+        <h3>Derniers contrôles</h3>
+      </div>
+      <div id="recentQcList" class="history-list">
+        <div class="empty-state">Aucun contrôle pour le moment</div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="scannerModal" class="scanner-modal hidden">
+    <div class="scanner-sheet">
+      <div class="scanner-head">
+        <h3>Scanner pour contrôle</h3>
+        <button class="scanner-close" onclick="closeScanner()">Fermer</button>
+      </div>
+
+      <p class="scanner-help">Scanne le QR du vélo en zone de contrôle.</p>
+
+      <div id="qr-reader" class="qr-reader-box"></div>
+
+      <div id="scanStatus" class="scan-status">Caméra en attente...</div>
     </div>
   </div>
 
-  <script>
-    document.getElementById("userName").innerText = localStorage.getItem("user_name") || "";
-  </script>
+  <div id="decisionModal" class="scanner-modal hidden">
+    <div class="scanner-sheet">
+      <div class="scanner-head">
+        <h3>Décision contrôle</h3>
+        <button class="scanner-close" onclick="closeDecisionModal()">Fermer</button>
+      </div>
+
+      <div class="decision-card">
+        <p class="decision-label">Vélo</p>
+        <div class="decision-value" id="decisionBikeId">-</div>
+
+        <p class="decision-label">Réparé par</p>
+        <div class="decision-subvalue" id="decisionMechanicName">-</div>
+
+        <p class="decision-label">Scanné à</p>
+        <div class="decision-subvalue" id="decisionCreatedAt">-</div>
+      </div>
+
+      <textarea
+        id="returnComment"
+        class="login-input decision-textarea"
+        placeholder="Commentaire si retour réparation"
+      ></textarea>
+
+      <div class="decision-actions">
+        <button class="primary-action" onclick="validateQc()">
+          Valider
+        </button>
+
+        <button class="danger-action" onclick="returnQc()">
+          Retour réparation
+        </button>
+      </div>
+
+      <div id="decisionStatus" class="scan-status">Choisis une décision.</div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="./js/config.js?v=12"></script>
+  <script src="./js/manager.js?v=12"></script>
 </body>
 </html>
