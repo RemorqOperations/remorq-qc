@@ -192,7 +192,7 @@ async function onScanSuccess(decodedText) {
 
     setTimeout(async () => {
       await closeScanner();
-    }, 450);
+    }, 500);
 
   } catch (error) {
     console.error(error);
@@ -204,10 +204,8 @@ async function onScanSuccess(decodedText) {
 
 function extractBikeIdFromQr(qrText) {
   if (!qrText) return "";
-
   const value = String(qrText).trim();
   if (!value.includes("/")) return "";
-
   const lastPart = value.split("/").pop() || "";
   return lastPart.replace(/=+$/, "").trim();
 }
@@ -329,8 +327,8 @@ function flashScannerSuccess() {
   const readerBox = document.getElementById("qr-reader");
 
   modal.classList.add("scan-success");
-  sheet.classList.add("scan-success");
-  readerBox.classList.add("scan-success");
+  if (sheet) sheet.classList.add("scan-success");
+  if (readerBox) readerBox.classList.add("scan-success");
 }
 
 function clearScannerSuccessUI() {
