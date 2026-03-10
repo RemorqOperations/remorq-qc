@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: rgba(0,0,0,0.86);
+  background: rgba(0,0,0,0.82);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -58,27 +58,7 @@
   overflow: hidden;
   border-radius: 22px;
   background: #000;
-  min-height: 280px;
-}
-
-#qr-reader {
-  border: none !important;
-  padding: 0 !important;
-}
-
-#qr-reader video {
-  width: 100% !important;
-  height: auto !important;
-  object-fit: cover;
-  border-radius: 20px;
-}
-
-#qr-reader__scan_region {
   min-height: 260px;
-}
-
-#qr-reader img {
-  display: none !important;
 }
 
 .scan-status {
