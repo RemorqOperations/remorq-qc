@@ -2,22 +2,44 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connexion - Remorq QC</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Connexion Remorq</title>
+  <link rel="stylesheet" href="./style.css?v=4" />
 </head>
-<body>
-  <div class="container">
-    <div class="card">
-      <h1>Connexion</h1>
-      <input type="text" id="login" placeholder="Login" />
-      <input type="password" id="password" placeholder="Mot de passe" />
-      <button class="btn" onclick="login()">Se connecter</button>
-      <p id="message"></p>
-    </div>
+<body class="mobile-app">
+  <div class="mobile-shell">
+
+    <header class="mobile-header">
+      <div>
+        <p class="app-kicker">Remorq QC</p>
+        <h1 class="app-title">Connexion</h1>
+      </div>
+    </header>
+
+    <section class="profile-card">
+      <div class="avatar-circle">R</div>
+      <div class="profile-info">
+        <p class="profile-label">Application QC</p>
+        <h2>Accès atelier</h2>
+      </div>
+    </section>
+
+    <section class="main-counter-card login-card">
+      <p class="main-counter-label">Connectez-vous</p>
+
+      <input id="login" class="login-input" type="text" placeholder="Login" />
+      <input id="password" class="login-input" type="password" placeholder="Mot de passe" />
+
+      <button class="primary-action" onclick="login()">
+        Se connecter
+      </button>
+
+      <p id="message" class="login-error"></p>
+    </section>
+
   </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/auth.js"></script>
 </body>
 </html>
