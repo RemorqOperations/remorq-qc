@@ -224,12 +224,6 @@ async function submitQcDecision(decision) {
     return;
   }
 
-  if (decision === "RETURNED" && !comment) {
-    statusBox.className = "scan-status error";
-    statusBox.innerText = "Ajoute un commentaire pour le retour";
-    return;
-  }
-
   statusBox.className = "scan-status";
   statusBox.innerText = "Enregistrement de la décision...";
 
@@ -310,9 +304,9 @@ async function loadManagerDashboard() {
 }
 
 function renderManagerDashboard(data) {
-  document.getElementById("controlledCount").innerText = String(data.controlled || 0);
+  document.getElementById("validatedMainCount").innerText = String(data.validated || 0);
   document.getElementById("pendingCount").innerText = String(data.pending || 0);
-  document.getElementById("validatedCount").innerText = String(data.validated || 0);
+  document.getElementById("controlledCount").innerText = String(data.controlled || 0);
   document.getElementById("returnedCount").innerText = String(data.returned || 0);
   document.getElementById("mechanicsCount").innerText = String(data.mechanics_count || 0);
 
@@ -402,8 +396,7 @@ function apiJsonp(action, params = {}) {
     function cleanup() {
       try {
         delete window[callbackName];
-      } catch (e) {
-      }
+      } catch (e) {}
       if (script.parentNode) {
         script.parentNode.removeChild(script);
       }
