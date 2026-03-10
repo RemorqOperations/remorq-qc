@@ -188,7 +188,7 @@ async function onScanSuccess(decodedText) {
     setTimeout(async () => {
       await closeScanner();
       openDecisionModal(currentRepair);
-    }, 450);
+    }, 500);
 
   } catch (error) {
     console.error(error);
@@ -358,16 +358,16 @@ function renderRecentQc(items) {
   }
 
   box.innerHTML = items.map(item => `
-    <div class="history-item">
-      <div class="history-top">
-        <div class="bike-id">${escapeHtml(item.bike_id || "")}</div>
-        <div class="badge ${getBadgeClass(item.status)}">${getStatusLabel(item.status)}</div>
+      <div class="history-item">
+        <div class="history-top">
+          <div class="bike-id">${escapeHtml(item.bike_id || "")}</div>
+          <div class="badge ${getBadgeClass(item.status)}">${getStatusLabel(item.status)}</div>
+        </div>
+        <div class="history-meta">
+          ${escapeHtml(item.mechanic_name || "")} · ${escapeHtml(item.qc_at || "")}
+        </div>
       </div>
-      <div class="history-meta">
-        ${escapeHtml(item.mechanic_name || "")} · ${escapeHtml(item.qc_at || "")}
-      </div>
-    `;
-  }).join("");
+  `).join("");
 }
 
 function getBadgeClass(status) {
@@ -424,8 +424,8 @@ function flashScannerSuccess() {
   const readerBox = document.getElementById("qr-reader");
 
   modal.classList.add("scan-success");
-  sheet.classList.add("scan-success");
-  readerBox.classList.add("scan-success");
+  if (sheet) sheet.classList.add("scan-success");
+  if (readerBox) readerBox.classList.add("scan-success");
 }
 
 function clearScannerSuccessUI() {
