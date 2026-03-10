@@ -4,17 +4,27 @@
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
-  font-family: Inter, Arial, sans-serif;
-  background: linear-gradient(
+
+margin:0;
+padding:0;
+
+font-family: Inter, Arial, sans-serif;
+
+background:
+radial-gradient(
+circle at top left,
+rgba(99,245,142,0.35) 0%,
+rgba(99,245,142,0.18) 18%,
+rgba(0,0,0,0) 40%
+),
+linear-gradient(
 180deg,
-#63F58E 0%,
-#1ecf74 25%,
-#0c3f2b 60%,
+#0a0a0a 0%,
 #000000 100%
 );
-  color: #ffffff;
+
+color:#ffffff;
+
 }
 
 body.mobile-app {
