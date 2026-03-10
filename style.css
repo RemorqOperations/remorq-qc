@@ -7,7 +7,13 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: Inter, Arial, sans-serif;
-  background: radial-gradient(circle at top, #63F58E 0%, #1bbf6b 40%, #0f3b2c 100%);
+  background: linear-gradient(
+180deg,
+#63F58E 0%,
+#1ecf74 25%,
+#0c3f2b 60%,
+#000000 100%
+);
   color: #ffffff;
 }
 
