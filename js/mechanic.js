@@ -8,6 +8,7 @@
   }
 
   document.getElementById("userName").innerText = userName;
+  document.getElementById("userAvatar").innerText = userName.charAt(0).toUpperCase();
 
   renderDemoData();
 })();
@@ -24,11 +25,11 @@ function renderDemoData() {
 }
 
 function refreshDashboard() {
-  alert("Étape suivante : on branchera les vraies données Google Sheets.");
+  alert("Étape suivante : on branche les vraies données.");
 }
 
 function openScanner() {
-  alert("Étape suivante : on ajoute le scanner QR ici.");
+  alert("Étape suivante : on ajoute le scanner QR.");
 }
 
 function logout() {
