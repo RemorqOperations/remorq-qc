@@ -29,6 +29,14 @@ async function openScanner() {
   status.innerText = "Ouverture caméra...";
 
   try {
+    if (!window.isSecureContext) {
+      throw new Error("Contexte non sécurisé");
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error("Caméra non supportée par le navigateur");
+    }
+
     if (!html5QrCode) {
       html5QrCode = new Html5Qrcode("qr-reader");
     }
@@ -38,30 +46,7 @@ async function openScanner() {
       return;
     }
 
-    const cameras = await Html5Qrcode.getCameras();
-
-    if (!cameras || cameras.length === 0) {
-      status.className = "scan-status error";
-      status.innerText = "Aucune caméra trouvée";
-      return;
-    }
-
-    const selectedCamera = pickBackCamera(cameras);
-
-    await html5QrCode.start(
-      selectedCamera.id,
-      {
-        fps: 20,
-        qrbox: calcQrBox(),
-        aspectRatio: 1,
-        disableFlip: true,
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
-        }
-      },
-      onScanSuccess,
-      onScanFailure
-    );
+    await startScannerWithFallback(html5QrCode);
 
     scannerRunning = true;
     scanLocked = false;
@@ -72,8 +57,46 @@ async function openScanner() {
     await tryImproveCameraFocus();
   } catch (error) {
     status.className = "scan-status error";
-    status.innerText = "Impossible d’ouvrir la caméra";
+    status.innerText = getCameraErrorMessage(error);
     console.error(error);
+  }
+}
+
+async function startScannerWithFallback(scannerInstance) {
+  const config = {
+    fps: 20,
+    qrbox: calcQrBox(),
+    aspectRatio: 1,
+    disableFlip: true,
+    experimentalFeatures: {
+      useBarCodeDetectorIfSupported: true
+    }
+  };
+
+  try {
+    await scannerInstance.start(
+      { facingMode: { ideal: "environment" } },
+      config,
+      onScanSuccess,
+      onScanFailure
+    );
+    return;
+  } catch (firstError) {
+    console.log("Fallback camera deviceId...", firstError);
+
+    const cameras = await Html5Qrcode.getCameras();
+    if (!cameras || cameras.length === 0) {
+      throw new Error("Aucune caméra trouvée");
+    }
+
+    const selectedCamera = pickBackCamera(cameras);
+
+    await scannerInstance.start(
+      selectedCamera.id,
+      config,
+      onScanSuccess,
+      onScanFailure
+    );
   }
 }
 
@@ -142,8 +165,7 @@ async function closeScanner() {
   status.innerText = "Caméra en attente...";
 }
 
-function onScanFailure(error) {
-}
+function onScanFailure(error) {}
 
 async function onScanSuccess(decodedText) {
   if (scanLocked) return;
@@ -276,10 +298,8 @@ async function submitQcDecision(decision) {
 
 function extractBikeIdFromQr(qrText) {
   if (!qrText) return "";
-
   const value = String(qrText).trim();
   if (!value.includes("/")) return "";
-
   const lastPart = value.split("/").pop() || "";
   return lastPart.replace(/=+$/, "").trim();
 }
@@ -369,8 +389,8 @@ function renderRecentQc(items) {
       <div class="history-meta">
         ${escapeHtml(item.mechanic_name || "")} · ${escapeHtml(item.qc_at || "")}
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function getBadgeClass(status) {
@@ -467,6 +487,28 @@ function playSuccessBeep() {
   } catch (e) {
     console.log("Bip non disponible");
   }
+}
+
+function getCameraErrorMessage(error) {
+  const message = String(error && error.message ? error.message : error || "").toLowerCase();
+
+  if (message.includes("notallowed") || message.includes("permission") || message.includes("denied")) {
+    return "Accès caméra refusé. Autorise la caméra dans Safari.";
+  }
+
+  if (message.includes("secure")) {
+    return "Caméra disponible uniquement en HTTPS.";
+  }
+
+  if (message.includes("notfound") || message.includes("aucune caméra")) {
+    return "Aucune caméra trouvée.";
+  }
+
+  if (message.includes("notreadable") || message.includes("trackstart")) {
+    return "Caméra déjà utilisée par une autre app.";
+  }
+
+  return "Impossible d’ouvrir la caméra";
 }
 
 function escapeHtml(value) {
