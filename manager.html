@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Dashboard Responsable</title>
-  <link rel="stylesheet" href="./style.css?v=14" />
+  <link rel="stylesheet" href="./style.css?v=15" />
 </head>
 <body class="mobile-app">
   <div class="mobile-shell">
@@ -26,9 +26,9 @@
     </section>
 
     <section class="main-counter-card">
-      <p class="main-counter-label">Total contrôlés aujourd’hui</p>
+      <p class="main-counter-label">Vélos validés aujourd’hui</p>
       <div class="main-counter-wrap">
-        <div class="main-counter-number" id="controlledCount">0</div>
+        <div class="main-counter-number" id="validatedMainCount">0</div>
       </div>
     </section>
 
@@ -39,8 +39,8 @@
       </div>
 
       <div class="stat-card">
-        <p class="stat-title">Validés</p>
-        <div class="stat-value" id="validatedCount">0</div>
+        <p class="stat-title">Total contrôlés</p>
+        <div class="stat-value" id="controlledCount">0</div>
       </div>
 
       <div class="stat-card">
@@ -120,7 +120,7 @@
       <textarea
         id="returnComment"
         class="login-input decision-textarea"
-        placeholder="Commentaire si retour réparation"
+        placeholder="Commentaire optionnel"
       ></textarea>
 
       <div class="decision-actions">
@@ -137,8 +137,8 @@
     </div>
   </div>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script src="./js/config.js?v=13"></script>
-<script src="./js/manager.js?v=13"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="./js/config.js?v=15"></script>
+  <script src="./js/manager.js?v=15"></script>
 </body>
 </html>
