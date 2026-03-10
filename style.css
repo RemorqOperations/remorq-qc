@@ -11,17 +11,9 @@ padding:0;
 font-family: Inter, Arial, sans-serif;
 
 background:
-radial-gradient(
-circle at top left,
-rgba(99,245,142,0.35) 0%,
-rgba(99,245,142,0.18) 18%,
-rgba(0,0,0,0) 40%
-),
-linear-gradient(
-180deg,
-#0a0a0a 0%,
-#000000 100%
-);
+radial-gradient(circle at top left, rgba(99,245,142,0.45), transparent 35%),
+radial-gradient(circle at bottom right, rgba(99,245,142,0.15), transparent 40%),
+#000;
 
 color:#ffffff;
 
