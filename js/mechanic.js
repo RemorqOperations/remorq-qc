@@ -14,23 +14,8 @@ let scanLocked = false;
   document.getElementById("userName").innerText = userName;
   document.getElementById("userAvatar").innerText = userName.charAt(0).toUpperCase();
 
-  renderDemoData();
+  loadMechanicDashboard();
 })();
-
-function renderDemoData() {
-  document.getElementById("validatedCount").innerText = "0";
-  document.getElementById("pendingCount").innerText = "0";
-  document.getElementById("returnedCount").innerText = "0";
-
-  const recentList = document.getElementById("recentList");
-  recentList.innerHTML = `
-    <div class="empty-state">Aucun scan pour le moment</div>
-  `;
-}
-
-function refreshDashboard() {
-  alert("Étape suivante : on branchera les vraies données.");
-}
 
 async function openScanner() {
   const modal = document.getElementById("scannerModal");
@@ -82,7 +67,6 @@ async function openScanner() {
     status.innerText = "Caméra active. Scanne le QR du vélo.";
 
     await tryImproveCameraFocus();
-
   } catch (error) {
     status.className = "scan-status error";
     status.innerText = "Impossible d’ouvrir la caméra";
@@ -96,21 +80,19 @@ function pickBackCamera(cameras) {
     labelLower: String(c.label || "").toLowerCase()
   }));
 
-  const preferred =
+  return (
     normalized.find(c => c.labelLower.includes("back")) ||
     normalized.find(c => c.labelLower.includes("rear")) ||
     normalized.find(c => c.labelLower.includes("environment")) ||
     normalized.find(c => c.labelLower.includes("arrière")) ||
     normalized.find(c => c.labelLower.includes("arriere")) ||
-    normalized[normalized.length - 1];
-
-  return preferred;
+    normalized[normalized.length - 1]
+  );
 }
 
 function calcQrBox() {
   const width = Math.min(window.innerWidth || 320, 520);
   const size = Math.max(220, Math.floor(width * 0.72));
-
   return { width: size, height: size };
 }
 
@@ -173,70 +155,169 @@ async function onScanSuccess(decodedText) {
     return;
   }
 
-  if (navigator.vibrate) {
-    navigator.vibrate(120);
+  status.className = "scan-status";
+  status.innerText = "Enregistrement du vélo " + bikeId + "...";
+
+  const mechanicId = localStorage.getItem("user_id") || "";
+  const mechanicName = localStorage.getItem("user_name") || "";
+
+  try {
+    const response = await apiJsonp("saveRepairScan", {
+      mechanic_id: mechanicId,
+      mechanic_name: mechanicName,
+      bike_id: bikeId,
+      qr_raw: decodedText
+    });
+
+    if (!response.success) {
+      status.className = "scan-status error";
+      status.innerText = response.message || "Erreur lors de l’enregistrement";
+      scanLocked = false;
+      return;
+    }
+
+    if (navigator.vibrate) {
+      navigator.vibrate(120);
+    }
+
+    status.className = "scan-status success";
+    status.innerText = "Vélo " + bikeId + " enregistré";
+
+    await loadMechanicDashboard();
+
+    setTimeout(async () => {
+      await closeScanner();
+    }, 350);
+
+  } catch (error) {
+    console.error(error);
+    status.className = "scan-status error";
+    status.innerText = "Erreur de connexion au serveur";
+    scanLocked = false;
   }
-
-  status.className = "scan-status success";
-  status.innerText = "Vélo " + bikeId + " détecté";
-
-  addRecentScan({
-    bike_id: bikeId,
-    scanned_at: new Date().toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit"
-    }),
-    status: "PENDING_QC"
-  });
-
-  setTimeout(async () => {
-    await closeScanner();
-    alert("Vélo " + bikeId + " prêt pour contrôle");
-  }, 350);
 }
 
 function extractBikeIdFromQr(qrText) {
   if (!qrText) return "";
 
   const value = String(qrText).trim();
-
   if (!value.includes("/")) return "";
 
   const lastPart = value.split("/").pop() || "";
-  const cleaned = lastPart.replace(/=+$/, "").trim();
-
-  if (!cleaned) return "";
-
-  return cleaned;
+  return lastPart.replace(/=+$/, "").trim();
 }
 
-function addRecentScan(scan) {
+function refreshDashboard() {
+  loadMechanicDashboard();
+}
+
+async function loadMechanicDashboard() {
+  const mechanicId = localStorage.getItem("user_id") || "";
+
+  try {
+    const response = await apiJsonp("mechanicDashboard", {
+      mechanic_id: mechanicId
+    });
+
+    if (!response.success) {
+      console.error(response.message || "Erreur dashboard");
+      renderDashboard({
+        validated: 0,
+        pending: 0,
+        returned: 0,
+        recent: []
+      });
+      return;
+    }
+
+    renderDashboard(response);
+  } catch (error) {
+    console.error(error);
+    renderDashboard({
+      validated: 0,
+      pending: 0,
+      returned: 0,
+      recent: []
+    });
+  }
+}
+
+function renderDashboard(data) {
+  document.getElementById("validatedCount").innerText = String(data.validated || 0);
+  document.getElementById("pendingCount").innerText = String(data.pending || 0);
+  document.getElementById("returnedCount").innerText = String(data.returned || 0);
+
   const recentList = document.getElementById("recentList");
-  const empty = recentList.querySelector(".empty-state");
+  const recent = Array.isArray(data.recent) ? data.recent : [];
 
-  if (empty) {
-    empty.remove();
+  if (recent.length === 0) {
+    recentList.innerHTML = `<div class="empty-state">Aucun scan pour le moment</div>`;
+    return;
   }
 
-  const item = document.createElement("div");
-  item.className = "history-item";
+  recentList.innerHTML = recent.map(item => {
+    const badgeClass = getBadgeClass(item.status);
+    const badgeLabel = getStatusLabel(item.status);
 
-  item.innerHTML = `
-    <div class="history-top">
-      <div class="bike-id">${escapeHtml(scan.bike_id)}</div>
-      <div class="badge pending">À contrôler</div>
-    </div>
-    <div class="history-meta">Scanné à ${escapeHtml(scan.scanned_at)}</div>
-  `;
+    return `
+      <div class="history-item">
+        <div class="history-top">
+          <div class="bike-id">${escapeHtml(item.bike_id || "")}</div>
+          <div class="badge ${badgeClass}">${badgeLabel}</div>
+        </div>
+        <div class="history-meta">Scanné à ${escapeHtml(item.scanned_at || "")}</div>
+      </div>
+    `;
+  }).join("");
+}
 
-  recentList.prepend(item);
+function getBadgeClass(status) {
+  if (status === "VALIDATED") return "validated";
+  if (status === "RETURNED") return "returned";
+  return "pending";
+}
 
-  while (recentList.children.length > 5) {
-    recentList.removeChild(recentList.lastChild);
-  }
+function getStatusLabel(status) {
+  if (status === "VALIDATED") return "Validé";
+  if (status === "RETURNED") return "Retourné";
+  return "À contrôler";
+}
 
-  const pending = parseInt(document.getElementById("pendingCount").innerText || "0", 10);
-  document.getElementById("pendingCount").innerText = String(pending + 1);
+function apiJsonp(action, params = {}) {
+  return new Promise((resolve, reject) => {
+    const callbackName = "remorqCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+
+    window[callbackName] = function (data) {
+      cleanup();
+      resolve(data);
+    };
+
+    const query = new URLSearchParams({
+      action,
+      callback: callbackName,
+      ...params
+    });
+
+    const script = document.createElement("script");
+    script.src = API_URL + "?" + query.toString();
+
+    script.onerror = function () {
+      cleanup();
+      reject(new Error("Erreur JSONP"));
+    };
+
+    document.body.appendChild(script);
+
+    function cleanup() {
+      try {
+        delete window[callbackName];
+      } catch (e) {
+      }
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    }
+  });
 }
 
 function escapeHtml(value) {
