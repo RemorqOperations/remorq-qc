@@ -1,39 +1,8 @@
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-html, body {
-
-margin:0;
-padding:0;
-
-font-family: Inter, Arial, sans-serif;
-
-background:
-radial-gradient(circle at top left, rgba(99,245,142,0.45), transparent 35%),
-radial-gradient(circle at bottom right, rgba(99,245,142,0.15), transparent 40%),
-#000;
-
-color:#ffffff;
-
-}
-
-body.mobile-app {
-  min-height: 100vh;
-}
-
-.mobile-shell {
-  width: 100%;
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 16px 14px 28px;
-}
 .scanner-modal {
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: rgba(0,0,0,0.82);
+  background: rgba(0,0,0,0.86);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -89,7 +58,27 @@ body.mobile-app {
   overflow: hidden;
   border-radius: 22px;
   background: #000;
+  min-height: 280px;
+}
+
+#qr-reader {
+  border: none !important;
+  padding: 0 !important;
+}
+
+#qr-reader video {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+#qr-reader__scan_region {
   min-height: 260px;
+}
+
+#qr-reader img {
+  display: none !important;
 }
 
 .scan-status {
@@ -110,307 +99,4 @@ body.mobile-app {
 .scan-status.error {
   background: rgba(239,68,68,0.14);
   color: #fecaca;
-}
-
-.mobile-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.app-kicker {
-  margin: 0 0 6px 0;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.7);
-}
-
-.app-title {
-  margin: 0;
-  font-size: 30px;
-  line-height: 1.05;
-  font-weight: 800;
-}
-
-.logout-btn {
-  border: 0;
-  background: rgba(255,255,255,0.14);
-  color: #fff;
-  padding: 12px 14px;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  backdrop-filter: blur(8px);
-  cursor: pointer;
-}
-
-.profile-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px;
-  border-radius: 24px;
-  background: rgba(255,255,255,0.10);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255,255,255,0.08);
-  margin-bottom: 16px;
-}
-
-.avatar-circle {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #63F58E, #30d977);
-  color: #063d21;
-  font-size: 22px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.profile-label {
-  margin: 0 0 4px 0;
-  font-size: 13px;
-  color: rgba(255,255,255,0.7);
-}
-
-.profile-info h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 800;
-}
-
-.main-counter-card {
-  padding: 20px 18px 24px;
-  border-radius: 28px;
-  background: linear-gradient(180deg, #ffffff 0%, #eafff1 100%);
-  color: #0f172a;
-  box-shadow: 0 18px 45px rgba(0,0,0,0.25);
-  margin-bottom: 16px;
-}
-
-.main-counter-label {
-  margin: 0 0 14px 0;
-  text-align: center;
-  font-size: 15px;
-  font-weight: 600;
-  color: #475569;
-}
-
-.main-counter-wrap {
-  min-height: 190px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.main-counter-number {
-  font-size: 92px;
-  line-height: 0.95;
-  font-weight: 900;
-  text-align: center;
-  color: #0f172a;
-}
-
-.stats-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.stat-card {
-  padding: 18px 16px;
-  border-radius: 22px;
-  background: rgba(255,255,255,0.10);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255,255,255,0.08);
-  text-align: center;
-}
-
-.stat-title {
-  margin: 0 0 10px 0;
-  font-size: 14px;
-  color: rgba(255,255,255,0.75);
-}
-
-.stat-value {
-  font-size: 42px;
-  line-height: 1;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-.action-zone {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.primary-action,
-.secondary-action {
-  width: 100%;
-  border: 0;
-  border-radius: 20px;
-  min-height: 58px;
-  padding: 16px 18px;
-  font-size: 17px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.primary-action {
-  background: linear-gradient(135deg, #63F58E, #3ddc73);
-  color: #063d21;
-  box-shadow: 0 14px 28px rgba(99, 245, 142, 0.35);
-}
-
-.secondary-action {
-  background: rgba(255,255,255,0.14);
-  color: white;
-  backdrop-filter: blur(8px);
-}
-
-.history-card {
-  padding: 18px 16px;
-  border-radius: 24px;
-  background: rgba(255,255,255,0.10);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.history-head {
-  margin-bottom: 12px;
-}
-
-.history-head h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.history-list {
-  display: grid;
-  gap: 10px;
-}
-
-.history-item {
-  padding: 14px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.08);
-}
-
-.history-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.bike-id {
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.history-meta {
-  font-size: 13px;
-  color: rgba(255,255,255,0.72);
-}
-
-.badge {
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.badge.pending {
-  background: rgba(250, 204, 21, 0.18);
-  color: #fde68a;
-}
-
-.badge.validated {
-  background: rgba(34, 197, 94, 0.16);
-  color: #bbf7d0;
-}
-
-.badge.returned {
-  background: rgba(239, 68, 68, 0.16);
-  color: #fecaca;
-}
-
-.empty-state {
-  padding: 16px;
-  border-radius: 16px;
-  text-align: center;
-  font-size: 14px;
-  color: rgba(255,255,255,0.72);
-  background: rgba(255,255,255,0.06);
-}
-
-.login-card {
-  padding-top: 24px;
-}
-
-.login-input {
-  width: 100%;
-  padding: 16px;
-  margin-bottom: 14px;
-  border-radius: 14px;
-  border: 1px solid #d1f5dc;
-  background: #ffffff;
-  color: #0f172a;
-  font-size: 16px;
-  outline: none;
-}
-
-.login-input:focus {
-  border-color: #63F58E;
-  box-shadow: 0 0 0 3px rgba(99, 245, 142, 0.18);
-}
-
-.login-error {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #b42318;
-  text-align: center;
-  min-height: 20px;
-}
-
-@media (max-width: 420px) {
-  .mobile-shell {
-    padding: 14px 12px 24px;
-  }
-
-  .mobile-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .app-title {
-    font-size: 28px;
-  }
-
-  .main-counter-wrap {
-    min-height: 165px;
-  }
-
-  .main-counter-number {
-    font-size: 78px;
-  }
-
-  .stats-row {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .stat-value {
-    font-size: 36px;
-  }
 }
