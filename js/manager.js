@@ -23,6 +23,8 @@ async function openScanner() {
   const status = document.getElementById("scanStatus");
 
   modal.classList.remove("hidden");
+  clearScannerSuccessUI();
+
   status.className = "scan-status";
   status.innerText = "Ouverture caméra...";
 
@@ -134,6 +136,7 @@ async function closeScanner() {
   }
 
   scanLocked = false;
+  clearScannerSuccessUI();
   modal.classList.add("hidden");
   status.className = "scan-status";
   status.innerText = "Caméra en attente...";
@@ -171,14 +174,22 @@ async function onScanSuccess(decodedText) {
       return;
     }
 
-    currentRepair = response.repair;
+    playSuccessBeep();
+    flashScannerSuccess();
 
     if (navigator.vibrate) {
       navigator.vibrate(120);
     }
 
-    await closeScanner();
-    openDecisionModal(currentRepair);
+    currentRepair = response.repair;
+
+    status.className = "scan-status success";
+    status.innerText = "Vélo " + bikeId + " trouvé";
+
+    setTimeout(async () => {
+      await closeScanner();
+      openDecisionModal(currentRepair);
+    }, 450);
 
   } catch (error) {
     console.error(error);
@@ -239,6 +250,12 @@ async function submitQcDecision(decision) {
       statusBox.className = "scan-status error";
       statusBox.innerText = response.message || "Erreur lors de la mise à jour";
       return;
+    }
+
+    playSuccessBeep();
+
+    if (navigator.vibrate) {
+      navigator.vibrate(120);
     }
 
     statusBox.className = "scan-status success";
@@ -402,6 +419,54 @@ function apiJsonp(action, params = {}) {
       }
     }
   });
+}
+
+function flashScannerSuccess() {
+  const modal = document.getElementById("scannerModal");
+  const sheet = modal.querySelector(".scanner-sheet");
+  const readerBox = document.getElementById("qr-reader");
+
+  modal.classList.add("scan-success");
+  sheet.classList.add("scan-success");
+  readerBox.classList.add("scan-success");
+}
+
+function clearScannerSuccessUI() {
+  const modal = document.getElementById("scannerModal");
+  if (!modal) return;
+
+  const sheet = modal.querySelector(".scanner-sheet");
+  const readerBox = document.getElementById("qr-reader");
+
+  modal.classList.remove("scan-success");
+  if (sheet) sheet.classList.remove("scan-success");
+  if (readerBox) readerBox.classList.remove("scan-success");
+}
+
+function playSuccessBeep() {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    const audioCtx = new AudioContextClass();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(1046, audioCtx.currentTime);
+
+    gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.14);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.14);
+  } catch (e) {
+    console.log("Bip non disponible");
+  }
 }
 
 function escapeHtml(value) {
