@@ -468,3 +468,18 @@ body.mobile-app {
     gap: 10px;
   }
 }
+.scanner-modal.scan-success {
+  background: rgba(99, 245, 142, 0.22);
+  transition: background 0.18s ease;
+}
+
+.scanner-sheet.scan-success {
+  background: rgba(10, 40, 20, 0.92);
+  box-shadow: 0 -8px 40px rgba(99, 245, 142, 0.18);
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.qr-reader-box.scan-success {
+  box-shadow: 0 0 0 2px rgba(99, 245, 142, 0.55) inset;
+  transition: box-shadow 0.18s ease;
+}
