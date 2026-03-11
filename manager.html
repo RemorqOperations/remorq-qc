@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Dashboard Responsable</title>
-  <link rel="stylesheet" href="./style.css?v=19" />
+  <link rel="stylesheet" href="./style.css?v=20" />
 </head>
 <body class="mobile-app">
   <div class="mobile-shell">
@@ -25,10 +25,30 @@
       </div>
     </section>
 
+    <section class="day-nav-card">
+      <button class="day-nav-btn" onclick="previousDay()">◀</button>
+      <div class="day-nav-date" id="dashboardDate">-</div>
+      <button class="day-nav-btn" onclick="nextDay()">▶</button>
+    </section>
+
     <section class="main-counter-card">
-      <p class="main-counter-label">Vélos validés aujourd’hui</p>
+      <p class="main-counter-label">Vélos à déployer aujourd'hui</p>
       <div class="main-counter-wrap">
         <div class="main-counter-number" id="validatedMainCount">0</div>
+      </div>
+    </section>
+
+    <section class="stats-row">
+      <div class="stat-card">
+        <p class="stat-title">HARD validés</p>
+        <div class="stat-value" id="hardCount">0</div>
+        <p class="stat-percent" id="hardPercent">0%</p>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">EASY/MEDIUM validés</p>
+        <div class="stat-value" id="easyCount">0</div>
+        <p class="stat-percent" id="easyPercent">0%</p>
       </div>
     </section>
 
@@ -66,7 +86,7 @@
 
     <section class="history-card">
       <div class="history-head">
-        <h3>Production par mécano</h3>
+        <h3>Production par réparateur</h3>
       </div>
       <div id="mechanicStatsList" class="history-list">
         <div class="empty-state">Aucune donnée pour le moment</div>
@@ -85,6 +105,7 @@
   </div>
 
   <div id="scannerModal" class="scanner-modal hidden">
+    <div class="scanner-flash-layer"></div>
     <div class="scanner-sheet">
       <div class="scanner-head">
         <h3>Scanner pour contrôle</h3>
@@ -113,6 +134,9 @@
         <p class="decision-label">Réparé par</p>
         <div class="decision-subvalue" id="decisionMechanicName">-</div>
 
+        <p class="decision-label">Type réparation</p>
+        <div class="decision-subvalue" id="decisionRepairType">-</div>
+
         <p class="decision-label">Scanné à</p>
         <div class="decision-subvalue" id="decisionCreatedAt">-</div>
       </div>
@@ -138,8 +162,7 @@
   </div>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
-
-<script src="./js/config.js?v=19"></script>
-<script src="./js/manager.js?v=19"></script>
+  <script src="./js/config.js?v=20"></script>
+  <script src="./js/manager.js?v=20"></script>
 </body>
 </html>
