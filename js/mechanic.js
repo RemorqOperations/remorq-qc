@@ -1,466 +1,191 @@
-let html5QrCode = null;
-let scannerRunning = false;
-let scanLocked = false;
-let pendingScanData = null;
-let dashboardDayOffset = 0;
+let html5QrCode=null;
+let scannerRunning=false;
+let scanLocked=false;
+let pendingScan=null;
 
-(function initMechanicPage() {
-  const userName = localStorage.getItem("user_name");
-  const userRole = localStorage.getItem("user_role");
+let dashboardDayOffset=0;
 
-  if (!userName || userRole !== "MECANO") {
-    window.location.href = "login.html";
-    return;
-  }
+let torchEnabled=false;
 
-  document.getElementById("userName").innerText = userName;
-  document.getElementById("userAvatar").innerText = userName.charAt(0).toUpperCase();
+function previousDay(){
 
-  loadMechanicDashboard();
-})();
+dashboardDayOffset--;
+loadDashboard();
 
-function previousDay() {
-  dashboardDayOffset--;
-  loadMechanicDashboard();
 }
 
-function nextDay() {
-  dashboardDayOffset++;
-  loadMechanicDashboard();
+function nextDay(){
+
+dashboardDayOffset++;
+loadDashboard();
+
 }
 
-async function openScanner() {
-  const modal = document.getElementById("scannerModal");
-  const status = document.getElementById("scanStatus");
+async function toggleTorch(){
 
-  modal.classList.remove("hidden");
-  clearScannerSuccessUI();
+if(!html5QrCode)return;
 
-  status.className = "scan-status";
-  status.innerText = "Ouverture caméra...";
+try{
 
-  try {
-    if (!html5QrCode) {
-      html5QrCode = new Html5Qrcode("qr-reader");
-    }
+torchEnabled=!torchEnabled;
 
-    if (scannerRunning) {
-      status.innerText = "Caméra déjà active";
-      return;
-    }
+await html5QrCode.applyVideoConstraints({
+advanced:[{torch:torchEnabled}]
+});
 
-    const cameras = await Html5Qrcode.getCameras();
+}catch(e){
 
-    if (!cameras || cameras.length === 0) {
-      status.className = "scan-status error";
-      status.innerText = "Aucune caméra trouvée";
-      return;
-    }
+console.log("flash non supporté");
 
-    const selectedCamera = pickBackCamera(cameras);
-
-    await html5QrCode.start(
-      selectedCamera.id,
-      {
-        fps: 20,
-        qrbox: calcQrBox(),
-        aspectRatio: 1,
-        disableFlip: true,
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
-        }
-      },
-      onScanSuccess,
-      onScanFailure
-    );
-
-    scannerRunning = true;
-    scanLocked = false;
-
-    status.className = "scan-status";
-    status.innerText = "Caméra active. Scanne le QR du vélo.";
-
-    await tryImproveCameraFocus();
-  } catch (error) {
-    console.error(error);
-    status.className = "scan-status error";
-    status.innerText = "Impossible d’ouvrir la caméra";
-  }
 }
 
-function pickBackCamera(cameras) {
-  const normalized = cameras.map(c => ({
-    ...c,
-    labelLower: String(c.label || "").toLowerCase()
-  }));
-
-  return (
-    normalized.find(c => c.labelLower.includes("back")) ||
-    normalized.find(c => c.labelLower.includes("rear")) ||
-    normalized.find(c => c.labelLower.includes("environment")) ||
-    normalized.find(c => c.labelLower.includes("arrière")) ||
-    normalized.find(c => c.labelLower.includes("arriere")) ||
-    normalized[normalized.length - 1]
-  );
 }
 
-function calcQrBox() {
-  const width = Math.min(window.innerWidth || 320, 520);
-  const size = Math.max(220, Math.floor(width * 0.72));
-  return { width: size, height: size };
+async function openScanner(){
+
+const modal=document.getElementById("scannerModal");
+
+modal.classList.remove("hidden");
+
+if(!html5QrCode){
+
+html5QrCode=new Html5Qrcode("qr-reader");
+
 }
 
-async function tryImproveCameraFocus() {
-  if (!html5QrCode) return;
+const cameras=await Html5Qrcode.getCameras();
 
-  try {
-    await html5QrCode.applyVideoConstraints({
-      advanced: [{ focusMode: "continuous" }]
-    });
-  } catch (e1) {
-    try {
-      await html5QrCode.applyVideoConstraints({
-        focusMode: "continuous"
-      });
-    } catch (e2) {
-      console.log("Focus continu non supporté");
-    }
-  }
+await html5QrCode.start(
+
+cameras[0].id,
+
+{fps:20,qrbox:250},
+
+onScanSuccess
+
+);
+
+scannerRunning=true;
+
 }
 
-async function closeScanner() {
-  const modal = document.getElementById("scannerModal");
-  const status = document.getElementById("scanStatus");
+async function closeScanner(){
 
-  try {
-    if (html5QrCode && scannerRunning) {
-      await html5QrCode.stop();
-      scannerRunning = false;
-    }
+const modal=document.getElementById("scannerModal");
 
-    if (html5QrCode) {
-      await html5QrCode.clear();
-      html5QrCode = null;
-    }
-  } catch (error) {
-    console.error(error);
-  }
+if(html5QrCode && scannerRunning){
 
-  scanLocked = false;
-  clearScannerSuccessUI();
-  modal.classList.add("hidden");
-  status.className = "scan-status";
-  status.innerText = "Caméra en attente...";
+await html5QrCode.stop();
+
+scannerRunning=false;
+
 }
 
-function onScanFailure(error) {}
+modal.classList.add("hidden");
 
-async function onScanSuccess(decodedText) {
-  if (scanLocked) return;
-  scanLocked = true;
-
-  const status = document.getElementById("scanStatus");
-  const bikeId = extractBikeIdFromQr(decodedText);
-
-  if (!bikeId) {
-    status.className = "scan-status error";
-    status.innerText = "QR non reconnu";
-    scanLocked = false;
-    return;
-  }
-
-  pendingScanData = {
-    bike_id: bikeId,
-    qr_raw: decodedText
-  };
-
-  playSuccessBeep();
-  triggerScanFlash();
-  flashScannerSuccess();
-
-  if (navigator.vibrate) {
-    navigator.vibrate(120);
-  }
-
-  status.className = "scan-status success";
-  status.innerText = "QR détecté : " + bikeId;
-
-  setTimeout(async () => {
-    await closeScanner();
-    openRepairTypeModal();
-  }, 500);
 }
 
-function openRepairTypeModal() {
-  if (!pendingScanData || !pendingScanData.bike_id) return;
+function onScanSuccess(text){
 
-  document.getElementById("repairTypeBikeId").innerText = pendingScanData.bike_id;
-  document.getElementById("repairTypeStatus").className = "scan-status";
-  document.getElementById("repairTypeStatus").innerText = "Sélectionne un type.";
-  document.getElementById("repairTypeModal").classList.remove("hidden");
+if(scanLocked)return;
+
+scanLocked=true;
+
+const bike=text.split("/").pop().replace("=","");
+
+pendingScan={
+bike_id:bike,
+qr_raw:text
+};
+
+closeScanner();
+
+document.getElementById("repairTypeBikeId").innerText=bike;
+
+document.getElementById("repairTypeModal").classList.remove("hidden");
+
 }
 
-function closeRepairTypeModal() {
-  document.getElementById("repairTypeModal").classList.add("hidden");
-  document.getElementById("repairTypeStatus").className = "scan-status";
-  document.getElementById("repairTypeStatus").innerText = "Sélectionne un type.";
-  pendingScanData = null;
-  scanLocked = false;
+function closeRepairTypeModal(){
+
+document.getElementById("repairTypeModal").classList.add("hidden");
+
+scanLocked=false;
+
 }
 
-async function submitRepairType(repairType) {
-  const status = document.getElementById("repairTypeStatus");
+async function submitRepairType(type){
 
-  if (!pendingScanData || !pendingScanData.bike_id || !pendingScanData.qr_raw) {
-    status.className = "scan-status error";
-    status.innerText = "Aucun vélo détecté";
-    return;
-  }
+const mechanicId=localStorage.getItem("user_id");
+const mechanicName=localStorage.getItem("user_name");
 
-  const mechanicId = localStorage.getItem("user_id") || "";
-  const mechanicName = localStorage.getItem("user_name") || "";
+const res=await api("saveRepairScan",{
 
-  status.className = "scan-status";
-  status.innerText = "Enregistrement du vélo...";
+mechanic_id:mechanicId,
+mechanic_name:mechanicName,
+bike_id:pendingScan.bike_id,
+qr_raw:pendingScan.qr_raw,
+repair_type:type
 
-  try {
-    const response = await apiJsonp("saveRepairScan", {
-      mechanic_id: mechanicId,
-      mechanic_name: mechanicName,
-      bike_id: pendingScanData.bike_id,
-      qr_raw: pendingScanData.qr_raw,
-      repair_type: repairType
-    });
+});
 
-    if (!response.success) {
-      status.className = "scan-status error";
-      status.innerText = response.message || "Erreur lors de l’enregistrement";
-      scanLocked = false;
-      return;
-    }
+if(res.success){
 
-    playSuccessBeep();
+loadDashboard();
 
-    if (navigator.vibrate) {
-      navigator.vibrate(120);
-    }
+closeRepairTypeModal();
 
-    status.className = "scan-status success";
-    status.innerText = "Vélo " + pendingScanData.bike_id + " enregistré en " + repairType;
-
-    await loadMechanicDashboard();
-
-    setTimeout(() => {
-      closeRepairTypeModal();
-    }, 500);
-
-  } catch (error) {
-    console.error(error);
-    status.className = "scan-status error";
-    status.innerText = "Erreur de connexion au serveur";
-    scanLocked = false;
-  }
 }
 
-function extractBikeIdFromQr(qrText) {
-  if (!qrText) return "";
-  const value = String(qrText).trim();
-  if (!value.includes("/")) return "";
-  const lastPart = value.split("/").pop() || "";
-  return lastPart.replace(/=+$/, "").trim();
 }
 
-function refreshDashboard() {
-  loadMechanicDashboard();
+async function loadDashboard(){
+
+const mechanicId=localStorage.getItem("user_id");
+
+const res=await api("mechanicDashboard",{
+
+mechanic_id:mechanicId,
+day_offset:dashboardDayOffset
+
+});
+
+document.getElementById("validatedCount").innerText=res.validated;
+document.getElementById("pendingCount").innerText=res.pending;
+document.getElementById("returnedCount").innerText=res.returned;
+document.getElementById("dashboardDate").innerText=res.date_label;
+
 }
 
-async function loadMechanicDashboard() {
-  const mechanicId = localStorage.getItem("user_id") || "";
+function api(action,data){
 
-  try {
-    const response = await apiJsonp("mechanicDashboard", {
-      mechanic_id: mechanicId,
-      day_offset: dashboardDayOffset
-    });
+return new Promise((resolve)=>{
 
-    if (!response.success) {
-      renderDashboard({
-        validated: 0,
-        pending: 0,
-        returned: 0,
-        recent: [],
-        date_label: "-"
-      });
-      return;
-    }
+const cb="cb"+Date.now();
 
-    renderDashboard(response);
-  } catch (error) {
-    console.error(error);
-    renderDashboard({
-      validated: 0,
-      pending: 0,
-      returned: 0,
-      recent: [],
-      date_label: "-"
-    });
-  }
+window[cb]=(r)=>resolve(r);
+
+const q=new URLSearchParams({
+action,
+callback:cb,
+...data
+});
+
+const s=document.createElement("script");
+
+s.src=API_URL+"?"+q;
+
+document.body.appendChild(s);
+
+});
+
 }
 
-function renderDashboard(data) {
-  document.getElementById("validatedCount").innerText = String(data.validated || 0);
-  document.getElementById("pendingCount").innerText = String(data.pending || 0);
-  document.getElementById("returnedCount").innerText = String(data.returned || 0);
-  document.getElementById("dashboardDate").innerText = data.date_label || "-";
+function logout(){
 
-  const recentList = document.getElementById("recentList");
-  const recent = Array.isArray(data.recent) ? data.recent : [];
+localStorage.clear();
+location.href="login.html";
 
-  if (recent.length === 0) {
-    recentList.innerHTML = `<div class="empty-state">Aucun scan pour le moment</div>`;
-    return;
-  }
-
-  recentList.innerHTML = recent.map(item => {
-    const badgeClass = getBadgeClass(item.status);
-    const badgeLabel = getStatusLabel(item.status);
-
-    return `
-      <div class="history-item">
-        <div class="history-top">
-          <div class="bike-id">${escapeHtml(item.bike_id || "")}</div>
-          <div class="badge ${badgeClass}">${badgeLabel}</div>
-        </div>
-        <div class="history-meta">
-          ${escapeHtml(item.scanned_at || "")} · ${escapeHtml(item.repair_type || "")}
-        </div>
-      </div>
-    `;
-  }).join("");
 }
 
-function getBadgeClass(status) {
-  if (status === "VALIDATED") return "validated";
-  if (status === "RETURNED") return "returned";
-  return "pending";
-}
-
-function getStatusLabel(status) {
-  if (status === "VALIDATED") return "Validé";
-  if (status === "RETURNED") return "Retourné";
-  return "À contrôler";
-}
-
-function apiJsonp(action, params = {}) {
-  return new Promise((resolve, reject) => {
-    const callbackName = "remorqCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
-
-    window[callbackName] = function (data) {
-      cleanup();
-      resolve(data);
-    };
-
-    const query = new URLSearchParams({
-      action,
-      callback: callbackName,
-      ...params
-    });
-
-    const script = document.createElement("script");
-    script.src = API_URL + "?" + query.toString();
-
-    script.onerror = function () {
-      cleanup();
-      reject(new Error("Erreur JSONP"));
-    };
-
-    document.body.appendChild(script);
-
-    function cleanup() {
-      try {
-        delete window[callbackName];
-      } catch (e) {}
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    }
-  });
-}
-
-function triggerScanFlash() {
-  const modal = document.getElementById("scannerModal");
-  if (!modal) return;
-
-  modal.classList.remove("scan-flash");
-  void modal.offsetWidth;
-  modal.classList.add("scan-flash");
-
-  setTimeout(() => {
-    modal.classList.remove("scan-flash");
-  }, 260);
-}
-
-function flashScannerSuccess() {
-  const modal = document.getElementById("scannerModal");
-  const sheet = modal.querySelector(".scanner-sheet");
-  const readerBox = document.getElementById("qr-reader");
-
-  modal.classList.add("scan-success");
-  if (sheet) sheet.classList.add("scan-success");
-  if (readerBox) readerBox.classList.add("scan-success");
-}
-
-function clearScannerSuccessUI() {
-  const modal = document.getElementById("scannerModal");
-  if (!modal) return;
-
-  const sheet = modal.querySelector(".scanner-sheet");
-  const readerBox = document.getElementById("qr-reader");
-
-  modal.classList.remove("scan-success");
-  modal.classList.remove("scan-flash");
-  if (sheet) sheet.classList.remove("scan-success");
-  if (readerBox) readerBox.classList.remove("scan-success");
-}
-
-function playSuccessBeep() {
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-
-    const audioCtx = new AudioContextClass();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(1046, audioCtx.currentTime);
-
-    gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.14);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    oscillator.start(audioCtx.currentTime);
-    oscillator.stop(audioCtx.currentTime + 0.14);
-  } catch (e) {
-    console.log("Bip non disponible");
-  }
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function logout() {
-  localStorage.removeItem("user_id");
-  localStorage.removeItem("user_name");
-  localStorage.removeItem("user_role");
-  window.location.href = "login.html";
-}
+loadDashboard();
