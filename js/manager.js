@@ -174,6 +174,7 @@ async function onScanSuccess(decodedText) {
     }
 
     playSuccessBeep();
+    triggerScanFlash();
     flashScannerSuccess();
 
     if (navigator.vibrate) {
@@ -418,6 +419,19 @@ function apiJsonp(action, params = {}) {
   });
 }
 
+function triggerScanFlash() {
+  const modal = document.getElementById("scannerModal");
+  if (!modal) return;
+
+  modal.classList.remove("scan-flash");
+  void modal.offsetWidth;
+  modal.classList.add("scan-flash");
+
+  setTimeout(() => {
+    modal.classList.remove("scan-flash");
+  }, 260);
+}
+
 function flashScannerSuccess() {
   const modal = document.getElementById("scannerModal");
   const sheet = modal.querySelector(".scanner-sheet");
@@ -436,6 +450,7 @@ function clearScannerSuccessUI() {
   const readerBox = document.getElementById("qr-reader");
 
   modal.classList.remove("scan-success");
+  modal.classList.remove("scan-flash");
   if (sheet) sheet.classList.remove("scan-success");
   if (readerBox) readerBox.classList.remove("scan-success");
 }
