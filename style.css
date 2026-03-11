@@ -524,3 +524,119 @@ body.mobile-app {
   );
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22) inset;
 }
+.scanner-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.86);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  transition: background 0.22s ease;
+}
+
+.scanner-modal.hidden {
+  display: none;
+}
+
+.scanner-flash-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255,255,255,0.95) 0%,
+    rgba(255,255,255,0.55) 28%,
+    rgba(255,255,255,0.12) 55%,
+    rgba(255,255,255,0) 72%
+  );
+}
+
+.scanner-modal.scan-flash .scanner-flash-layer {
+  animation: scannerFlashEffect 0.24s ease-out;
+}
+
+@keyframes scannerFlashEffect {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.scanner-sheet {
+  width: 100%;
+  max-width: 520px;
+  background: linear-gradient(180deg, #07110c 0%, #020503 100%);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 18px 14px 22px;
+  transition: background 0.22s ease, box-shadow 0.22s ease;
+}
+
+.qr-reader-box {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #000;
+  min-height: 280px;
+  transition: background 0.22s ease, box-shadow 0.22s ease;
+}
+
+.scanner-modal.scan-success {
+  background: rgba(99, 245, 142, 0.28);
+}
+
+.scanner-sheet.scan-success {
+  background: linear-gradient(
+    180deg,
+    rgba(99, 245, 142, 0.95) 0%,
+    rgba(61, 220, 115, 0.92) 35%,
+    rgba(18, 120, 58, 0.94) 100%
+  );
+  box-shadow: 0 -10px 40px rgba(99, 245, 142, 0.32);
+}
+
+.qr-reader-box.scan-success {
+  background: linear-gradient(
+    180deg,
+    rgba(99, 245, 142, 0.22) 0%,
+    rgba(61, 220, 115, 0.14) 100%
+  );
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22) inset;
+}
+
+.repair-type-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.repair-type-btn {
+  width: 100%;
+  border: 0;
+  border-radius: 20px;
+  min-height: 58px;
+  padding: 16px 18px;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.repair-type-btn.easy {
+  background: linear-gradient(135deg, #63F58E, #3ddc73);
+  color: #063d21;
+  box-shadow: 0 14px 28px rgba(99, 245, 142, 0.30);
+}
+
+.repair-type-btn.medium {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  color: #3b2300;
+  box-shadow: 0 14px 28px rgba(245, 158, 11, 0.28);
+}
+
+.repair-type-btn.hard {
+  background: linear-gradient(135deg, #fb7185, #ef4444);
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(239, 68, 68, 0.28);
+}
