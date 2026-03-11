@@ -153,7 +153,6 @@ async function toggleTorch() {
 function updateTorchButton() {
   const btn = document.getElementById("torchButton");
   if (!btn) return;
-
   btn.innerText = torchEnabled ? "💡 Éteindre la lampe" : "💡 Allumer la lampe";
 }
 
@@ -223,6 +222,8 @@ async function onScanSuccess(decodedText) {
       return;
     }
 
+    currentRepair = response.repair;
+
     playSuccessBeep();
     triggerScanFlash();
     flashScannerSuccess();
@@ -230,8 +231,6 @@ async function onScanSuccess(decodedText) {
     if (navigator.vibrate) {
       navigator.vibrate(120);
     }
-
-    currentRepair = response.repair;
 
     status.className = "scan-status success";
     status.innerText = "Vélo " + bikeId + " trouvé";
