@@ -2,6 +2,7 @@ let html5QrCode = null;
 let scannerRunning = false;
 let scanLocked = false;
 let currentRepair = null;
+let dashboardDayOffset = 0;
 
 (function initManagerPage() {
   const userName = localStorage.getItem("user_name");
@@ -17,6 +18,16 @@ let currentRepair = null;
 
   loadManagerDashboard();
 })();
+
+function previousDay() {
+  dashboardDayOffset--;
+  loadManagerDashboard();
+}
+
+function nextDay() {
+  dashboardDayOffset++;
+  loadManagerDashboard();
+}
 
 async function openScanner() {
   const modal = document.getElementById("scannerModal");
@@ -202,6 +213,7 @@ async function onScanSuccess(decodedText) {
 function openDecisionModal(repair) {
   document.getElementById("decisionBikeId").innerText = repair.bike_id || "-";
   document.getElementById("decisionMechanicName").innerText = repair.mechanic_name || "-";
+  document.getElementById("decisionRepairType").innerText = repair.repair_type || "-";
   document.getElementById("decisionCreatedAt").innerText = repair.created_at || "-";
   document.getElementById("returnComment").value = "";
   document.getElementById("decisionStatus").className = "scan-status";
@@ -288,7 +300,9 @@ function refreshDashboard() {
 
 async function loadManagerDashboard() {
   try {
-    const response = await apiJsonp("managerDashboard", {});
+    const response = await apiJsonp("managerDashboard", {
+      day_offset: dashboardDayOffset
+    });
 
     if (!response.success) {
       renderManagerDashboard({
@@ -296,9 +310,14 @@ async function loadManagerDashboard() {
         pending: 0,
         validated: 0,
         returned: 0,
+        hard_validated: 0,
+        easy_validated: 0,
+        hard_percent: 0,
+        easy_percent: 0,
         mechanics_count: 0,
         mechanic_stats: [],
-        recent_qc: []
+        recent_qc: [],
+        date_label: "-"
       });
       return;
     }
@@ -311,9 +330,14 @@ async function loadManagerDashboard() {
       pending: 0,
       validated: 0,
       returned: 0,
+      hard_validated: 0,
+      easy_validated: 0,
+      hard_percent: 0,
+      easy_percent: 0,
       mechanics_count: 0,
       mechanic_stats: [],
-      recent_qc: []
+      recent_qc: [],
+      date_label: "-"
     });
   }
 }
@@ -324,6 +348,11 @@ function renderManagerDashboard(data) {
   document.getElementById("controlledCount").innerText = String(data.controlled || 0);
   document.getElementById("returnedCount").innerText = String(data.returned || 0);
   document.getElementById("mechanicsCount").innerText = String(data.mechanics_count || 0);
+  document.getElementById("hardCount").innerText = String(data.hard_validated || 0);
+  document.getElementById("easyCount").innerText = String(data.easy_validated || 0);
+  document.getElementById("hardPercent").innerText = String(data.hard_percent || 0) + "%";
+  document.getElementById("easyPercent").innerText = String(data.easy_percent || 0) + "%";
+  document.getElementById("dashboardDate").innerText = data.date_label || "-";
 
   renderMechanicStats(data.mechanic_stats || []);
   renderRecentQc(data.recent_qc || []);
@@ -344,7 +373,10 @@ function renderMechanicStats(items) {
         <div class="badge pending">${escapeHtml(String(item.repaired || 0))} réparés</div>
       </div>
       <div class="history-meta">
-        Validés: ${escapeHtml(String(item.validated || 0))} · Retournés: ${escapeHtml(String(item.returned || 0))}
+        Validés: ${escapeHtml(String(item.validated || 0))}
+        · Retournés: ${escapeHtml(String(item.returned || 0))}
+        · HARD: ${escapeHtml(String(item.hard_validated || 0))}
+        · EASY/MEDIUM: ${escapeHtml(String(item.easy_validated || 0))}
       </div>
     </div>
   `).join("");
@@ -365,7 +397,9 @@ function renderRecentQc(items) {
           <div class="badge ${getBadgeClass(item.status)}">${getStatusLabel(item.status)}</div>
         </div>
         <div class="history-meta">
-          ${escapeHtml(item.mechanic_name || "")} · ${escapeHtml(item.qc_at || "")}
+          ${escapeHtml(item.mechanic_name || "")}
+          · ${escapeHtml(item.qc_at || "")}
+          · ${escapeHtml(item.repair_type || "")}
         </div>
       </div>
   `).join("");
