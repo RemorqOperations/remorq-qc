@@ -1,6 +1,7 @@
 let html5QrCode = null;
 let scannerRunning = false;
 let scanLocked = false;
+let pendingScanData = null;
 
 (function initMechanicPage() {
   const userName = localStorage.getItem("user_name");
@@ -157,18 +158,67 @@ async function onScanSuccess(decodedText) {
     return;
   }
 
-  status.className = "scan-status";
-  status.innerText = "Enregistrement du vélo " + bikeId + "...";
+  pendingScanData = {
+    bike_id: bikeId,
+    qr_raw: decodedText
+  };
+
+  playSuccessBeep();
+  triggerScanFlash();
+  flashScannerSuccess();
+
+  if (navigator.vibrate) {
+    navigator.vibrate(120);
+  }
+
+  status.className = "scan-status success";
+  status.innerText = "QR détecté : " + bikeId;
+
+  setTimeout(async () => {
+    await closeScanner();
+    openRepairTypeModal();
+  }, 500);
+}
+
+function openRepairTypeModal() {
+  if (!pendingScanData || !pendingScanData.bike_id) return;
+
+  document.getElementById("repairTypeBikeId").innerText = pendingScanData.bike_id;
+  document.getElementById("repairTypeStatus").className = "scan-status";
+  document.getElementById("repairTypeStatus").innerText = "Sélectionne un type.";
+  document.getElementById("repairTypeModal").classList.remove("hidden");
+}
+
+function closeRepairTypeModal() {
+  document.getElementById("repairTypeModal").classList.add("hidden");
+  document.getElementById("repairTypeStatus").className = "scan-status";
+  document.getElementById("repairTypeStatus").innerText = "Sélectionne un type.";
+  pendingScanData = null;
+  scanLocked = false;
+}
+
+async function submitRepairType(repairType) {
+  const status = document.getElementById("repairTypeStatus");
+
+  if (!pendingScanData || !pendingScanData.bike_id || !pendingScanData.qr_raw) {
+    status.className = "scan-status error";
+    status.innerText = "Aucun vélo détecté";
+    return;
+  }
 
   const mechanicId = localStorage.getItem("user_id") || "";
   const mechanicName = localStorage.getItem("user_name") || "";
+
+  status.className = "scan-status";
+  status.innerText = "Enregistrement du vélo...";
 
   try {
     const response = await apiJsonp("saveRepairScan", {
       mechanic_id: mechanicId,
       mechanic_name: mechanicName,
-      bike_id: bikeId,
-      qr_raw: decodedText
+      bike_id: pendingScanData.bike_id,
+      qr_raw: pendingScanData.qr_raw,
+      repair_type: repairType
     });
 
     if (!response.success) {
@@ -179,19 +229,18 @@ async function onScanSuccess(decodedText) {
     }
 
     playSuccessBeep();
-    flashScannerSuccess();
 
     if (navigator.vibrate) {
       navigator.vibrate(120);
     }
 
     status.className = "scan-status success";
-    status.innerText = "Vélo " + bikeId + " enregistré";
+    status.innerText = "Vélo " + pendingScanData.bike_id + " enregistré en " + repairType;
 
     await loadMechanicDashboard();
 
-    setTimeout(async () => {
-      await closeScanner();
+    setTimeout(() => {
+      closeRepairTypeModal();
     }, 500);
 
   } catch (error) {
@@ -267,7 +316,9 @@ function renderDashboard(data) {
           <div class="bike-id">${escapeHtml(item.bike_id || "")}</div>
           <div class="badge ${badgeClass}">${badgeLabel}</div>
         </div>
-        <div class="history-meta">Scanné à ${escapeHtml(item.scanned_at || "")}</div>
+        <div class="history-meta">
+          Scanné à ${escapeHtml(item.scanned_at || "")} · ${escapeHtml(item.repair_type || "")}
+        </div>
       </div>
     `;
   }).join("");
@@ -321,6 +372,19 @@ function apiJsonp(action, params = {}) {
   });
 }
 
+function triggerScanFlash() {
+  const modal = document.getElementById("scannerModal");
+  if (!modal) return;
+
+  modal.classList.remove("scan-flash");
+  void modal.offsetWidth;
+  modal.classList.add("scan-flash");
+
+  setTimeout(() => {
+    modal.classList.remove("scan-flash");
+  }, 260);
+}
+
 function flashScannerSuccess() {
   const modal = document.getElementById("scannerModal");
   const sheet = modal.querySelector(".scanner-sheet");
@@ -339,6 +403,7 @@ function clearScannerSuccessUI() {
   const readerBox = document.getElementById("qr-reader");
 
   modal.classList.remove("scan-success");
+  modal.classList.remove("scan-flash");
   if (sheet) sheet.classList.remove("scan-success");
   if (readerBox) readerBox.classList.remove("scan-success");
 }
