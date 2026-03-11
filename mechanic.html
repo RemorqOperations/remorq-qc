@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Dashboard Mécano</title>
-  <link rel="stylesheet" href="./style.css?v=20" />
+  <link rel="stylesheet" href="./style.css?v=30" />
 </head>
 <body class="mobile-app">
   <div class="mobile-shell">
@@ -25,16 +25,17 @@
       </div>
     </section>
 
-    <section class="day-nav-card">
-      <button class="day-nav-btn" onclick="previousDay()">◀</button>
-      <div class="day-nav-date" id="dashboardDate">-</div>
-      <button class="day-nav-btn" onclick="nextDay()">▶</button>
-    </section>
-
     <section class="main-counter-card">
-      <p class="main-counter-label">Vélos validés aujourd’hui</p>
-      <div class="main-counter-wrap">
-        <div class="main-counter-number" id="validatedCount">0</div>
+      <div class="counter-nav">
+        <button class="counter-arrow" onclick="previousDay()">◀</button>
+
+        <div class="counter-center">
+          <p class="main-counter-label">Vélos validés aujourd’hui</p>
+          <div class="main-counter-number" id="validatedCount">0</div>
+          <div class="counter-date" id="dashboardDate">-</div>
+        </div>
+
+        <button class="counter-arrow" onclick="nextDay()">▶</button>
       </div>
     </section>
 
@@ -62,7 +63,7 @@
 
     <section class="history-card">
       <div class="history-head">
-        <h3>Historique du jour</h3>
+        <h3>Historique</h3>
       </div>
 
       <div id="recentList" class="history-list">
@@ -73,6 +74,7 @@
 
   <div id="scannerModal" class="scanner-modal hidden">
     <div class="scanner-flash-layer"></div>
+
     <div class="scanner-sheet">
       <div class="scanner-head">
         <h3>Scanner un vélo</h3>
@@ -82,6 +84,10 @@
       <p class="scanner-help">Place le QR code Lime dans le cadre.</p>
 
       <div id="qr-reader" class="qr-reader-box"></div>
+
+      <button id="torchButton" class="torch-btn" onclick="toggleTorch()">
+        💡 Allumer la lampe
+      </button>
 
       <div id="scanStatus" class="scan-status">Caméra en attente...</div>
     </div>
@@ -97,12 +103,17 @@
       <div class="decision-card">
         <p class="decision-label">Vélo détecté</p>
         <div class="decision-value" id="repairTypeBikeId">-</div>
-        <p class="decision-label">Choisis le type de réparation effectué</p>
+        <p class="decision-label">Choisis le type de réparation</p>
       </div>
 
       <div class="repair-type-grid">
-        <button class="repair-type-btn easy" onclick="submitRepairType('EASY_MEDIUM')">EASY / MEDIUM</button>
-        <button class="repair-type-btn hard" onclick="submitRepairType('HARD')">HARD</button>
+        <button class="repair-type-btn easy" onclick="submitRepairType('EASY_MEDIUM')">
+          EASY / MEDIUM
+        </button>
+
+        <button class="repair-type-btn hard" onclick="submitRepairType('HARD')">
+          HARD
+        </button>
       </div>
 
       <div id="repairTypeStatus" class="scan-status">Sélectionne un type.</div>
@@ -110,7 +121,7 @@
   </div>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
-  <script src="./js/config.js?v=20"></script>
-  <script src="./js/mechanic.js?v=20"></script>
+  <script src="./js/config.js?v=30"></script>
+  <script src="./js/mechanic.js?v=30"></script>
 </body>
 </html>
