@@ -25,6 +25,12 @@
       </div>
     </section>
 
+    <section class="day-nav-card">
+      <button class="day-nav-btn" onclick="previousDay()">◀</button>
+      <div class="day-nav-date" id="dashboardDate">-</div>
+      <button class="day-nav-btn" onclick="nextDay()">▶</button>
+    </section>
+
     <section class="main-counter-card">
       <p class="main-counter-label">Vélos validés aujourd’hui</p>
       <div class="main-counter-wrap">
@@ -56,7 +62,7 @@
 
     <section class="history-card">
       <div class="history-head">
-        <h3>Derniers scans</h3>
+        <h3>Historique du jour</h3>
       </div>
 
       <div id="recentList" class="history-list">
@@ -95,8 +101,7 @@
       </div>
 
       <div class="repair-type-grid">
-        <button class="repair-type-btn easy" onclick="submitRepairType('EASY')">EASY</button>
-        <button class="repair-type-btn medium" onclick="submitRepairType('MEDIUM')">MEDIUM</button>
+        <button class="repair-type-btn easy" onclick="submitRepairType('EASY_MEDIUM')">EASY / MEDIUM</button>
         <button class="repair-type-btn hard" onclick="submitRepairType('HARD')">HARD</button>
       </div>
 
