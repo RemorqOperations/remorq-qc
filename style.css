@@ -640,3 +640,41 @@ body.mobile-app {
   color: #ffffff;
   box-shadow: 0 14px 28px rgba(239, 68, 68, 0.28);
 }
+.day-nav-card {
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.day-nav-btn {
+  height: 48px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.day-nav-date {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  padding: 0 10px;
+}
+
+.stat-percent {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+}
