@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Dashboard Mécano</title>
-<link rel="stylesheet" href="./style.css?v=19" />
+  <link rel="stylesheet" href="./style.css?v=20" />
 </head>
 <body class="mobile-app">
   <div class="mobile-shell">
@@ -66,6 +66,7 @@
   </div>
 
   <div id="scannerModal" class="scanner-modal hidden">
+    <div class="scanner-flash-layer"></div>
     <div class="scanner-sheet">
       <div class="scanner-head">
         <h3>Scanner un vélo</h3>
@@ -80,9 +81,31 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <div id="repairTypeModal" class="scanner-modal hidden">
+    <div class="scanner-sheet">
+      <div class="scanner-head">
+        <h3>Type de réparation</h3>
+        <button class="scanner-close" onclick="closeRepairTypeModal()">Fermer</button>
+      </div>
 
-<script src="./js/config.js?v=19"></script>
-<script src="./js/mechanic.js?v=19"></script>
+      <div class="decision-card">
+        <p class="decision-label">Vélo détecté</p>
+        <div class="decision-value" id="repairTypeBikeId">-</div>
+        <p class="decision-label">Choisis le type de réparation effectué</p>
+      </div>
+
+      <div class="repair-type-grid">
+        <button class="repair-type-btn easy" onclick="submitRepairType('EASY')">EASY</button>
+        <button class="repair-type-btn medium" onclick="submitRepairType('MEDIUM')">MEDIUM</button>
+        <button class="repair-type-btn hard" onclick="submitRepairType('HARD')">HARD</button>
+      </div>
+
+      <div id="repairTypeStatus" class="scan-status">Sélectionne un type.</div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="./js/config.js?v=20"></script>
+  <script src="./js/mechanic.js?v=20"></script>
 </body>
 </html>
