@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dashboard Mécano</title>
-  <link rel="stylesheet" href="./style.css?v=30" />
+  <title>Dashboard Responsable</title>
+  <link rel="stylesheet" href="./style.css?v=31" />
 </head>
 <body class="mobile-app">
   <div class="mobile-shell">
@@ -12,16 +12,16 @@
     <header class="mobile-header">
       <div>
         <p class="app-kicker">Remorq QC</p>
-        <h1 class="app-title">Dashboard mécano</h1>
+        <h1 class="app-title">Dashboard responsable</h1>
       </div>
       <button class="logout-btn" onclick="logout()">Quitter</button>
     </header>
 
     <section class="profile-card">
-      <div class="avatar-circle" id="userAvatar">M</div>
+      <div class="avatar-circle" id="userAvatar">R</div>
       <div class="profile-info">
         <p class="profile-label">Connecté</p>
-        <h2 id="userName">Mécano</h2>
+        <h2 id="userName">Responsable</h2>
       </div>
     </section>
 
@@ -30,8 +30,8 @@
         <button class="counter-arrow" onclick="previousDay()">◀</button>
 
         <div class="counter-center">
-          <p class="main-counter-label">Vélos validés aujourd’hui</p>
-          <div class="main-counter-number" id="validatedCount">0</div>
+          <p class="main-counter-label">Vélos à déployer aujourd'hui</p>
+          <div class="main-counter-number" id="validatedMainCount">0</div>
           <div class="counter-date" id="dashboardDate">-</div>
         </div>
 
@@ -41,19 +41,43 @@
 
     <section class="stats-row">
       <div class="stat-card">
+        <p class="stat-title">HARD validés</p>
+        <div class="stat-value" id="hardCount">0</div>
+        <p class="stat-percent" id="hardPercent">0%</p>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">EASY/MEDIUM validés</p>
+        <div class="stat-value" id="easyCount">0</div>
+        <p class="stat-percent" id="easyPercent">0%</p>
+      </div>
+    </section>
+
+    <section class="stats-grid-2x2">
+      <div class="stat-card">
         <p class="stat-title">À contrôler</p>
         <div class="stat-value" id="pendingCount">0</div>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Total contrôlés</p>
+        <div class="stat-value" id="controlledCount">0</div>
       </div>
 
       <div class="stat-card">
         <p class="stat-title">Retournés</p>
         <div class="stat-value" id="returnedCount">0</div>
       </div>
+
+      <div class="stat-card">
+        <p class="stat-title">Mécanos actifs</p>
+        <div class="stat-value" id="mechanicsCount">0</div>
+      </div>
     </section>
 
     <section class="action-zone">
       <button class="primary-action" onclick="openScanner()">
-        Scanner un vélo réparé
+        Scanner pour contrôle
       </button>
 
       <button class="secondary-action" onclick="refreshDashboard()">
@@ -63,11 +87,11 @@
 
     <section class="history-card">
       <div class="history-head">
-        <h3>Historique</h3>
+        <h3>Derniers contrôles</h3>
       </div>
 
-      <div id="recentList" class="history-list">
-        <div class="empty-state">Aucun scan pour le moment</div>
+      <div id="recentQcList" class="history-list">
+        <div class="empty-state">Aucun contrôle pour le moment</div>
       </div>
     </section>
   </div>
@@ -77,11 +101,11 @@
 
     <div class="scanner-sheet">
       <div class="scanner-head">
-        <h3>Scanner un vélo</h3>
+        <h3>Scanner pour contrôle</h3>
         <button class="scanner-close" onclick="closeScanner()">Fermer</button>
       </div>
 
-      <p class="scanner-help">Place le QR code Lime dans le cadre.</p>
+      <p class="scanner-help">Scanne le QR du vélo en zone de contrôle.</p>
 
       <div id="qr-reader" class="qr-reader-box"></div>
 
@@ -93,35 +117,44 @@
     </div>
   </div>
 
-  <div id="repairTypeModal" class="scanner-modal hidden">
+  <div id="decisionModal" class="scanner-modal hidden">
     <div class="scanner-sheet">
       <div class="scanner-head">
-        <h3>Type de réparation</h3>
-        <button class="scanner-close" onclick="closeRepairTypeModal()">Fermer</button>
+        <h3>Décision contrôle</h3>
+        <button class="scanner-close" onclick="closeDecisionModal()">Fermer</button>
       </div>
 
       <div class="decision-card">
-        <p class="decision-label">Vélo détecté</p>
-        <div class="decision-value" id="repairTypeBikeId">-</div>
-        <p class="decision-label">Choisis le type de réparation</p>
+        <p class="decision-label">Vélo</p>
+        <div class="decision-value" id="decisionBikeId">-</div>
+
+        <p class="decision-label">Réparé par</p>
+        <div class="decision-subvalue" id="decisionMechanicName">-</div>
+
+        <p class="decision-label">Type réparation</p>
+        <div class="decision-subvalue" id="decisionRepairType">-</div>
+
+        <p class="decision-label">Scanné à</p>
+        <div class="decision-subvalue" id="decisionCreatedAt">-</div>
       </div>
 
-      <div class="repair-type-grid">
-        <button class="repair-type-btn easy" onclick="submitRepairType('EASY_MEDIUM')">
-          EASY / MEDIUM
-        </button>
+      <textarea
+        id="returnComment"
+        class="login-input decision-textarea"
+        placeholder="Commentaire optionnel"
+      ></textarea>
 
-        <button class="repair-type-btn hard" onclick="submitRepairType('HARD')">
-          HARD
-        </button>
+      <div class="decision-actions">
+        <button class="primary-action" onclick="validateQc()">Valider</button>
+        <button class="danger-action" onclick="returnQc()">Retour réparation</button>
       </div>
 
-      <div id="repairTypeStatus" class="scan-status">Sélectionne un type.</div>
+      <div id="decisionStatus" class="scan-status">Choisis une décision.</div>
     </div>
   </div>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
-  <script src="./js/config.js?v=30"></script>
-  <script src="./js/mechanic.js?v=30"></script>
+  <script src="./js/config.js?v=31"></script>
+  <script src="./js/manager.js?v=31"></script>
 </body>
 </html>
