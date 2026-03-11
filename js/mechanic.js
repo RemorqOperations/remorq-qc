@@ -2,6 +2,7 @@ let html5QrCode = null;
 let scannerRunning = false;
 let scanLocked = false;
 let pendingScanData = null;
+let dashboardDayOffset = 0;
 
 (function initMechanicPage() {
   const userName = localStorage.getItem("user_name");
@@ -17,6 +18,16 @@ let pendingScanData = null;
 
   loadMechanicDashboard();
 })();
+
+function previousDay() {
+  dashboardDayOffset--;
+  loadMechanicDashboard();
+}
+
+function nextDay() {
+  dashboardDayOffset++;
+  loadMechanicDashboard();
+}
 
 async function openScanner() {
   const modal = document.getElementById("scannerModal");
@@ -268,7 +279,8 @@ async function loadMechanicDashboard() {
 
   try {
     const response = await apiJsonp("mechanicDashboard", {
-      mechanic_id: mechanicId
+      mechanic_id: mechanicId,
+      day_offset: dashboardDayOffset
     });
 
     if (!response.success) {
@@ -276,7 +288,8 @@ async function loadMechanicDashboard() {
         validated: 0,
         pending: 0,
         returned: 0,
-        recent: []
+        recent: [],
+        date_label: "-"
       });
       return;
     }
@@ -288,7 +301,8 @@ async function loadMechanicDashboard() {
       validated: 0,
       pending: 0,
       returned: 0,
-      recent: []
+      recent: [],
+      date_label: "-"
     });
   }
 }
@@ -297,6 +311,7 @@ function renderDashboard(data) {
   document.getElementById("validatedCount").innerText = String(data.validated || 0);
   document.getElementById("pendingCount").innerText = String(data.pending || 0);
   document.getElementById("returnedCount").innerText = String(data.returned || 0);
+  document.getElementById("dashboardDate").innerText = data.date_label || "-";
 
   const recentList = document.getElementById("recentList");
   const recent = Array.isArray(data.recent) ? data.recent : [];
@@ -317,7 +332,7 @@ function renderDashboard(data) {
           <div class="badge ${badgeClass}">${badgeLabel}</div>
         </div>
         <div class="history-meta">
-          Scanné à ${escapeHtml(item.scanned_at || "")} · ${escapeHtml(item.repair_type || "")}
+          ${escapeHtml(item.scanned_at || "")} · ${escapeHtml(item.repair_type || "")}
         </div>
       </div>
     `;
