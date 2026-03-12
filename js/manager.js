@@ -353,7 +353,7 @@ async function loadManagerDashboard() {
         hard_percent: 0,
         easy_percent: 0,
         mechanics_count: 0,
-        recent_qc: [],
+        mechanics: [],
         date_label: "-"
       });
       return;
@@ -372,7 +372,7 @@ async function loadManagerDashboard() {
       hard_percent: 0,
       easy_percent: 0,
       mechanics_count: 0,
-      recent_qc: [],
+      mechanics: [],
       date_label: "-"
     });
   }
@@ -390,39 +390,42 @@ function renderManagerDashboard(data) {
   document.getElementById("easyPercent").innerText = String(data.easy_percent || 0) + "%";
   document.getElementById("dashboardDate").innerText = data.date_label || "-";
 
-  const recentQcList = document.getElementById("recentQcList");
-  const recent = Array.isArray(data.recent_qc) ? data.recent_qc : [];
+  const mechanicsList = document.getElementById("mechanicsList");
+  const mechanics = Array.isArray(data.mechanics) ? data.mechanics : [];
 
-  if (recent.length === 0) {
-    recentQcList.innerHTML = `<div class="empty-state">Aucun contrôle pour le moment</div>`;
+  if (mechanics.length === 0) {
+    mechanicsList.innerHTML = `<div class="empty-state">Aucune donnée pour le moment</div>`;
     return;
   }
 
-  recentQcList.innerHTML = recent.map(item => `
-    <div class="history-item">
-      <div class="history-top">
-        <div class="bike-id">${escapeHtml(item.bike_id || "")}</div>
-        <div class="badge ${getBadgeClass(item.status)}">${getStatusLabel(item.status)}</div>
-      </div>
-      <div class="history-meta">
-        ${escapeHtml(item.mechanic_name || "")}
-        ${item.qc_at ? "· " + escapeHtml(item.qc_at) : ""}
-        ${item.repair_type ? "· " + escapeHtml(item.repair_type) : ""}
-      </div>
-    </div>
-  `).join("");
-}
+  mechanicsList.innerHTML = mechanics.map(item => {
+    const avgClass =
+      item.avg_color === "green"
+        ? "avg-green"
+        : item.avg_color === "orange"
+        ? "avg-orange"
+        : "avg-red";
 
-function getBadgeClass(status) {
-  if (status === "VALIDATED") return "validated";
-  if (status === "RETURNED") return "returned";
-  return "pending";
-}
+    return `
+      <div class="history-item mechanic-card">
+        <div class="history-top">
+          <div class="bike-id">${escapeHtml(item.name || "")}</div>
+          <div class="avg-badge ${avgClass}">${escapeHtml(String(item.avg_per_hour || 0))}/h</div>
+        </div>
 
-function getStatusLabel(status) {
-  if (status === "VALIDATED") return "Validé";
-  if (status === "RETURNED") return "Retourné";
-  return "À contrôler";
+        <div class="mechanic-grid">
+          <div class="mechanic-line"><span>Validés</span><strong>${escapeHtml(String(item.validated || 0))}</strong></div>
+          <div class="mechanic-line"><span>HARD validés</span><strong>${escapeHtml(String(item.hard_validated || 0))}</strong></div>
+          <div class="mechanic-line"><span>EASY/MEDIUM validés</span><strong>${escapeHtml(String(item.easy_validated || 0))}</strong></div>
+          <div class="mechanic-line"><span>% HARD</span><strong>${escapeHtml(String(item.hard_percent || 0))}%</strong></div>
+          <div class="mechanic-line"><span>À contrôler</span><strong>${escapeHtml(String(item.pending || 0))}</strong></div>
+          <div class="mechanic-line"><span>HARD à contrôler</span><strong>${escapeHtml(String(item.hard_pending || 0))}</strong></div>
+          <div class="mechanic-line"><span>EASY/MEDIUM à contrôler</span><strong>${escapeHtml(String(item.easy_pending || 0))}</strong></div>
+          <div class="mechanic-line"><span>Retournés</span><strong>${escapeHtml(String(item.returned || 0))}</strong></div>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 function apiJsonp(action, params = {}) {
@@ -521,6 +524,18 @@ function playSuccessBeep() {
   } catch (e) {
     console.log("Bip non disponible");
   }
+}
+
+function getBadgeClass(status) {
+  if (status === "VALIDATED") return "validated";
+  if (status === "RETURNED") return "returned";
+  return "pending";
+}
+
+function getStatusLabel(status) {
+  if (status === "VALIDATED") return "Validé";
+  if (status === "RETURNED") return "Retourné";
+  return "À contrôler";
 }
 
 function escapeHtml(value) {
