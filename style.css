@@ -534,3 +534,63 @@ body{
     height:48px;
   }
 }
+.app-version{
+  margin:6px 0 0 0;
+  font-size:12px;
+  opacity:.72;
+  font-weight:700;
+}
+
+.mechanic-card{
+  padding:14px;
+  border-radius:14px;
+}
+
+.mechanic-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:10px;
+}
+
+.mechanic-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  font-size:13px;
+  background:rgba(255,255,255,0.04);
+  padding:8px 10px;
+  border-radius:10px;
+}
+
+.mechanic-line span{
+  opacity:.78;
+}
+
+.mechanic-line strong{
+  font-size:14px;
+}
+
+.avg-badge{
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.avg-green{
+  background:#63F58E;
+  color:#063d21;
+}
+
+.avg-orange{
+  background:#f59e0b;
+  color:#1f1300;
+}
+
+.avg-red{
+  background:#ef4444;
+  color:white;
+}
