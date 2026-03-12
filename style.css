@@ -40,6 +40,13 @@ body{
   font-weight:800;
 }
 
+.app-version{
+  margin:6px 0 0 0;
+  font-size:12px;
+  opacity:.72;
+  font-weight:700;
+}
+
 .logout-btn{
   background:rgba(255,255,255,0.15);
   border:none;
@@ -237,7 +244,7 @@ body{
 
 .history-list{
   display:grid;
-  gap:10px;
+  gap:12px;
 }
 
 .history-item{
@@ -282,6 +289,114 @@ body{
   text-align:center;
   opacity:.72;
 }
+
+/* ===============================
+   CARDS MECANOS
+================================ */
+
+.mechanic-card{
+  background:rgba(255,255,255,0.07);
+  border-radius:20px;
+  padding:16px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+.mechanic-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.mechanic-name{
+  font-size:19px;
+  font-weight:800;
+  line-height:1.1;
+}
+
+.avg-badge{
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.avg-green{
+  background:#63F58E;
+  color:#063d21;
+}
+
+.avg-orange{
+  background:#f59e0b;
+  color:#1f1300;
+}
+
+.avg-red{
+  background:#ef4444;
+  color:white;
+}
+
+.mechanic-section{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+
+.section-title{
+  margin:0 0 8px 0;
+  font-size:12px;
+  font-weight:800;
+  opacity:.68;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+
+.mechanic-grid{
+  display:grid;
+  gap:8px;
+}
+
+.mechanic-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  font-size:14px;
+  background:rgba(255,255,255,0.04);
+  padding:9px 10px;
+  border-radius:10px;
+}
+
+.mechanic-line span{
+  opacity:.8;
+}
+
+.mechanic-line strong{
+  font-size:14px;
+  font-weight:800;
+}
+
+.val-hard{
+  color:#ff9b5c;
+}
+
+.val-easy{
+  color:#63F58E;
+}
+
+.pending-number{
+  color:#ffc107;
+}
+
+.returned-number{
+  color:#ff6b6b;
+}
+
+/* ===============================
+   SCANNER
+================================ */
 
 .scanner-modal{
   position:fixed;
@@ -533,64 +648,8 @@ body{
     width:48px;
     height:48px;
   }
-}
-.app-version{
-  margin:6px 0 0 0;
-  font-size:12px;
-  opacity:.72;
-  font-weight:700;
-}
 
-.mechanic-card{
-  padding:14px;
-  border-radius:14px;
-}
-
-.mechanic-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-  margin-top:10px;
-}
-
-.mechanic-line{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  font-size:13px;
-  background:rgba(255,255,255,0.04);
-  padding:8px 10px;
-  border-radius:10px;
-}
-
-.mechanic-line span{
-  opacity:.78;
-}
-
-.mechanic-line strong{
-  font-size:14px;
-}
-
-.avg-badge{
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:800;
-  white-space:nowrap;
-}
-
-.avg-green{
-  background:#63F58E;
-  color:#063d21;
-}
-
-.avg-orange{
-  background:#f59e0b;
-  color:#1f1300;
-}
-
-.avg-red{
-  background:#ef4444;
-  color:white;
+  .mechanic-name{
+    font-size:17px;
+  }
 }
