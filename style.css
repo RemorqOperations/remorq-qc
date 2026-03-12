@@ -653,3 +653,93 @@ body{
     font-size:17px;
   }
 }
+.app-version{
+  margin:6px 0 0 0;
+  font-size:12px;
+  opacity:.6;
+  font-weight:700;
+}
+
+.mechanic-card{
+  background:rgba(255,255,255,0.06);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+}
+
+.mechanic-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+  gap:10px;
+}
+
+.mechanic-name{
+  font-size:18px;
+  font-weight:800;
+}
+
+.avg-badge{
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.avg-green{
+  background:#63F58E;
+  color:#063d21;
+}
+
+.avg-orange{
+  background:#ff9f2e;
+  color:black;
+}
+
+.avg-red{
+  background:#ff4d4d;
+  color:white;
+}
+
+.mechanic-section{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+
+.section-title{
+  font-size:12px;
+  opacity:.7;
+  margin-bottom:6px;
+  font-weight:700;
+}
+
+.mechanic-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  padding:3px 0;
+  gap:12px;
+}
+
+.mechanic-row strong{
+  font-weight:800;
+}
+
+.val-hard{
+  color:#ff7b3a;
+}
+
+.val-easy{
+  color:#63F58E;
+}
+
+.pending{
+  color:#ffc107;
+}
+
+.returned{
+  color:#ff4d4d;
+}
