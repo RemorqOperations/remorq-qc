@@ -14,8 +14,11 @@ let torchEnabled = false;
     return;
   }
 
-  document.getElementById("userName").innerText = userName;
-  document.getElementById("userAvatar").innerText = userName.charAt(0).toUpperCase();
+  const nameEl = document.getElementById("userName");
+  const avatarEl = document.getElementById("userAvatar");
+
+  if (nameEl) nameEl.innerText = userName;
+  if (avatarEl) avatarEl.innerText = userName.charAt(0).toUpperCase();
 
   loadMechanicDashboard();
 })();
@@ -30,16 +33,88 @@ function nextDay() {
   loadMechanicDashboard();
 }
 
+function refreshDashboard() {
+  loadMechanicDashboard();
+}
+
+async function loadMechanicDashboard() {
+  const mechanicId = localStorage.getItem("user_id") || "";
+
+  try {
+    const response = await apiJsonp("mechanicDashboard", {
+      mechanic_id: mechanicId,
+      day_offset: dashboardDayOffset
+    });
+
+    if (!response || !response.success) {
+      renderDashboard({
+        validated: 0,
+        pending: 0,
+        returned: 0,
+        recent: [],
+        date_label: "-"
+      });
+      return;
+    }
+
+    renderDashboard(response);
+  } catch (error) {
+    console.error(error);
+    renderDashboard({
+      validated: 0,
+      pending: 0,
+      returned: 0,
+      recent: [],
+      date_label: "-"
+    });
+  }
+}
+
+function renderDashboard(data) {
+  setText("validatedCount", data.validated || 0);
+  setText("pendingCount", data.pending || 0);
+  setText("returnedCount", data.returned || 0);
+  setText("dashboardDate", data.date_label || "-");
+
+  const recentList = document.getElementById("recentList");
+  const recent = Array.isArray(data.recent) ? data.recent : [];
+
+  if (!recent.length) {
+    recentList.innerHTML = `<div class="empty-state">Aucun scan pour le moment</div>`;
+    return;
+  }
+
+  recentList.innerHTML = recent.map(item => {
+    const badgeClass = getBadgeClass(item.status);
+    const badgeLabel = getStatusLabel(item.status);
+
+    return `
+      <div class="history-item">
+        <div class="history-top">
+          <div class="bike-id">${escapeHtml(item.bike_id || "")}</div>
+          <div class="badge ${badgeClass}">${badgeLabel}</div>
+        </div>
+        <div class="history-meta">
+          ${escapeHtml(item.scanned_at || "")}
+          ${item.repair_type ? "· " + escapeHtml(item.repair_type) : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
 async function openScanner() {
   const modal = document.getElementById("scannerModal");
   const status = document.getElementById("scanStatus");
 
-  modal.classList.remove("hidden");
+  if (modal) modal.classList.remove("hidden");
   clearScannerSuccessUI();
   updateTorchButton();
 
-  status.className = "scan-status";
-  status.innerText = "Ouverture caméra...";
+  if (status) {
+    status.className = "scan-status";
+    status.innerText = "Ouverture caméra...";
+  }
 
   try {
     if (!html5QrCode) {
@@ -47,15 +122,17 @@ async function openScanner() {
     }
 
     if (scannerRunning) {
-      status.innerText = "Caméra déjà active";
+      if (status) status.innerText = "Caméra déjà active";
       return;
     }
 
     const cameras = await Html5Qrcode.getCameras();
 
     if (!cameras || cameras.length === 0) {
-      status.className = "scan-status error";
-      status.innerText = "Aucune caméra trouvée";
+      if (status) {
+        status.className = "scan-status error";
+        status.innerText = "Aucune caméra trouvée";
+      }
       return;
     }
 
@@ -81,14 +158,18 @@ async function openScanner() {
     torchEnabled = false;
     updateTorchButton();
 
-    status.className = "scan-status";
-    status.innerText = "Caméra arrière active. Scanne le QR du vélo.";
+    if (status) {
+      status.className = "scan-status";
+      status.innerText = "Caméra arrière active. Scanne le QR du vélo.";
+    }
 
     await tryImproveCameraFocus();
   } catch (error) {
     console.error(error);
-    status.className = "scan-status error";
-    status.innerText = "Impossible d’ouvrir la caméra";
+    if (status) {
+      status.className = "scan-status error";
+      status.innerText = "Impossible d’ouvrir la caméra";
+    }
   }
 }
 
@@ -153,7 +234,6 @@ async function toggleTorch() {
 function updateTorchButton() {
   const btn = document.getElementById("torchButton");
   if (!btn) return;
-
   btn.innerText = torchEnabled ? "💡 Éteindre la lampe" : "💡 Allumer la lampe";
 }
 
@@ -187,9 +267,12 @@ async function closeScanner() {
   updateTorchButton();
   scanLocked = false;
   clearScannerSuccessUI();
-  modal.classList.add("hidden");
-  status.className = "scan-status";
-  status.innerText = "Caméra en attente...";
+
+  if (modal) modal.classList.add("hidden");
+  if (status) {
+    status.className = "scan-status";
+    status.innerText = "Caméra en attente...";
+  }
 }
 
 function onScanFailure(error) {}
@@ -202,8 +285,10 @@ async function onScanSuccess(decodedText) {
   const bikeId = extractBikeIdFromQr(decodedText);
 
   if (!bikeId) {
-    status.className = "scan-status error";
-    status.innerText = "QR non reconnu";
+    if (status) {
+      status.className = "scan-status error";
+      status.innerText = "QR non reconnu";
+    }
     scanLocked = false;
     return;
   }
@@ -221,8 +306,10 @@ async function onScanSuccess(decodedText) {
     navigator.vibrate(120);
   }
 
-  status.className = "scan-status success";
-  status.innerText = "QR détecté : " + bikeId;
+  if (status) {
+    status.className = "scan-status success";
+    status.innerText = "QR détecté : " + bikeId;
+  }
 
   setTimeout(async () => {
     await closeScanner();
@@ -233,16 +320,25 @@ async function onScanSuccess(decodedText) {
 function openRepairTypeModal() {
   if (!pendingScanData || !pendingScanData.bike_id) return;
 
-  document.getElementById("repairTypeBikeId").innerText = pendingScanData.bike_id;
-  document.getElementById("repairTypeStatus").className = "scan-status";
-  document.getElementById("repairTypeStatus").innerText = "Sélectionne un type.";
-  document.getElementById("repairTypeModal").classList.remove("hidden");
+  setText("repairTypeBikeId", pendingScanData.bike_id);
+  setText("repairTypeStatus", "Sélectionne un type.");
+  const status = document.getElementById("repairTypeStatus");
+  if (status) status.className = "scan-status";
+
+  const modal = document.getElementById("repairTypeModal");
+  if (modal) modal.classList.remove("hidden");
 }
 
 function closeRepairTypeModal() {
-  document.getElementById("repairTypeModal").classList.add("hidden");
-  document.getElementById("repairTypeStatus").className = "scan-status";
-  document.getElementById("repairTypeStatus").innerText = "Sélectionne un type.";
+  const modal = document.getElementById("repairTypeModal");
+  if (modal) modal.classList.add("hidden");
+
+  const status = document.getElementById("repairTypeStatus");
+  if (status) {
+    status.className = "scan-status";
+    status.innerText = "Sélectionne un type.";
+  }
+
   pendingScanData = null;
   scanLocked = false;
 }
@@ -251,16 +347,20 @@ async function submitRepairType(repairType) {
   const status = document.getElementById("repairTypeStatus");
 
   if (!pendingScanData || !pendingScanData.bike_id || !pendingScanData.qr_raw) {
-    status.className = "scan-status error";
-    status.innerText = "Aucun vélo détecté";
+    if (status) {
+      status.className = "scan-status error";
+      status.innerText = "Aucun vélo détecté";
+    }
     return;
   }
 
   const mechanicId = localStorage.getItem("user_id") || "";
   const mechanicName = localStorage.getItem("user_name") || "";
 
-  status.className = "scan-status";
-  status.innerText = "Enregistrement du vélo...";
+  if (status) {
+    status.className = "scan-status";
+    status.innerText = "Enregistrement du vélo...";
+  }
 
   try {
     const response = await apiJsonp("saveRepairScan", {
@@ -272,8 +372,10 @@ async function submitRepairType(repairType) {
     });
 
     if (!response.success) {
-      status.className = "scan-status error";
-      status.innerText = response.message || "Erreur lors de l’enregistrement";
+      if (status) {
+        status.className = "scan-status error";
+        status.innerText = response.message || "Erreur lors de l’enregistrement";
+      }
       scanLocked = false;
       return;
     }
@@ -284,8 +386,10 @@ async function submitRepairType(repairType) {
       navigator.vibrate(120);
     }
 
-    status.className = "scan-status success";
-    status.innerText = "Vélo " + pendingScanData.bike_id + " enregistré en " + repairType;
+    if (status) {
+      status.className = "scan-status success";
+      status.innerText = "Vélo " + pendingScanData.bike_id + " enregistré en " + repairType;
+    }
 
     await loadMechanicDashboard();
 
@@ -295,8 +399,10 @@ async function submitRepairType(repairType) {
 
   } catch (error) {
     console.error(error);
-    status.className = "scan-status error";
-    status.innerText = "Erreur de connexion au serveur";
+    if (status) {
+      status.className = "scan-status error";
+      status.innerText = "Erreur de connexion au serveur";
+    }
     scanLocked = false;
   }
 }
@@ -307,88 +413,6 @@ function extractBikeIdFromQr(qrText) {
   if (!value.includes("/")) return "";
   const lastPart = value.split("/").pop() || "";
   return lastPart.replace(/=+$/, "").trim();
-}
-
-function refreshDashboard() {
-  loadMechanicDashboard();
-}
-
-async function loadMechanicDashboard() {
-  const mechanicId = localStorage.getItem("user_id") || "";
-
-  try {
-    const response = await apiJsonp("mechanicDashboard", {
-      mechanic_id: mechanicId,
-      day_offset: dashboardDayOffset
-    });
-
-    if (!response.success) {
-      renderDashboard({
-        validated: 0,
-        pending: 0,
-        returned: 0,
-        recent: [],
-        date_label: "-"
-      });
-      return;
-    }
-
-    renderDashboard(response);
-  } catch (error) {
-    console.error(error);
-    renderDashboard({
-      validated: 0,
-      pending: 0,
-      returned: 0,
-      recent: [],
-      date_label: "-"
-    });
-  }
-}
-
-function renderDashboard(data) {
-  document.getElementById("validatedCount").innerText = String(data.validated || 0);
-  document.getElementById("pendingCount").innerText = String(data.pending || 0);
-  document.getElementById("returnedCount").innerText = String(data.returned || 0);
-  document.getElementById("dashboardDate").innerText = data.date_label || "-";
-
-  const recentList = document.getElementById("recentList");
-  const recent = Array.isArray(data.recent) ? data.recent : [];
-
-  if (recent.length === 0) {
-    recentList.innerHTML = `<div class="empty-state">Aucun scan pour le moment</div>`;
-    return;
-  }
-
-  recentList.innerHTML = recent.map(item => {
-    const badgeClass = getBadgeClass(item.status);
-    const badgeLabel = getStatusLabel(item.status);
-
-    return `
-      <div class="history-item">
-        <div class="history-top">
-          <div class="bike-id">${escapeHtml(item.bike_id || "")}</div>
-          <div class="badge ${badgeClass}">${badgeLabel}</div>
-        </div>
-        <div class="history-meta">
-          ${escapeHtml(item.scanned_at || "")}
-          ${item.repair_type ? "· " + escapeHtml(item.repair_type) : ""}
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function getBadgeClass(status) {
-  if (status === "VALIDATED") return "validated";
-  if (status === "RETURNED") return "returned";
-  return "pending";
-}
-
-function getStatusLabel(status) {
-  if (status === "VALIDATED") return "Validé";
-  if (status === "RETURNED") return "Retourné";
-  return "À contrôler";
 }
 
 function apiJsonp(action, params = {}) {
@@ -442,6 +466,8 @@ function triggerScanFlash() {
 
 function flashScannerSuccess() {
   const modal = document.getElementById("scannerModal");
+  if (!modal) return;
+
   const sheet = modal.querySelector(".scanner-sheet");
   const readerBox = document.getElementById("qr-reader");
 
@@ -487,6 +513,23 @@ function playSuccessBeep() {
   } catch (e) {
     console.log("Bip non disponible");
   }
+}
+
+function getBadgeClass(status) {
+  if (status === "VALIDATED") return "validated";
+  if (status === "RETURNED") return "returned";
+  return "pending";
+}
+
+function getStatusLabel(status) {
+  if (status === "VALIDATED") return "Validé";
+  if (status === "RETURNED") return "Retourné";
+  return "À contrôler";
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
 }
 
 function escapeHtml(value) {
