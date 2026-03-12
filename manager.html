@@ -1,161 +1,124 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dashboard Responsable</title>
-  <link rel="stylesheet" href="./style.css?v=32" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Responsable</title>
+
+<link rel="stylesheet" href="./style.css?v=40">
+
 </head>
-<body class="mobile-app">
-  <div class="mobile-shell">
 
-    <header class="mobile-header">
-      <div>
-        <p class="app-kicker">Remorq QC</p>
-        <h1 class="app-title">Dashboard responsable</h1>
-        <p class="app-version">Version 32</p>
-      </div>
-      <button class="logout-btn" onclick="logout()">Quitter</button>
-    </header>
+<body>
 
-    <section class="profile-card">
-      <div class="avatar-circle" id="userAvatar">R</div>
-      <div class="profile-info">
-        <p class="profile-label">Connecté</p>
-        <h2 id="userName">Responsable</h2>
-      </div>
-    </section>
+<div class="mobile-shell">
 
-    <section class="main-counter-card">
-      <div class="counter-nav">
-        <button class="counter-arrow" onclick="previousDay()">◀</button>
+<header class="mobile-header">
 
-        <div class="counter-center">
-          <p class="main-counter-label">Vélos à déployer aujourd'hui</p>
-          <div class="main-counter-number" id="validatedMainCount">0</div>
-          <div class="counter-date" id="dashboardDate">-</div>
-        </div>
+<div>
+<h1 class="app-title">Dashboard Responsable</h1>
+<div class="app-version">App version 40</div>
+</div>
 
-        <button class="counter-arrow" onclick="nextDay()">▶</button>
-      </div>
-    </section>
+<button class="logout-btn" onclick="logout()">Quitter</button>
 
-    <section class="stats-row">
-      <div class="stat-card">
-        <p class="stat-title">HARD validés</p>
-        <div class="stat-value" id="hardCount">0</div>
-        <p class="stat-percent" id="hardPercent">0%</p>
-      </div>
+</header>
 
-      <div class="stat-card">
-        <p class="stat-title">EASY/MEDIUM validés</p>
-        <div class="stat-value" id="easyCount">0</div>
-        <p class="stat-percent" id="easyPercent">0%</p>
-      </div>
-    </section>
+<section class="profile-card">
 
-    <section class="stats-grid-2x2">
-      <div class="stat-card">
-        <p class="stat-title">À contrôler</p>
-        <div class="stat-value" id="pendingCount">0</div>
-      </div>
+<div class="avatar-circle" id="userAvatar">R</div>
 
-      <div class="stat-card">
-        <p class="stat-title">Total contrôlés</p>
-        <div class="stat-value" id="controlledCount">0</div>
-      </div>
+<div>
+<div id="userName">Responsable</div>
+</div>
 
-      <div class="stat-card">
-        <p class="stat-title">Retournés</p>
-        <div class="stat-value" id="returnedCount">0</div>
-      </div>
+</section>
 
-      <div class="stat-card">
-        <p class="stat-title">Mécanos actifs</p>
-        <div class="stat-value" id="mechanicsCount">0</div>
-      </div>
-    </section>
 
-    <section class="action-zone">
-      <button class="primary-action" onclick="openScanner()">
-        Scanner pour contrôle
-      </button>
+<section class="main-counter-card">
 
-      <button class="secondary-action" onclick="refreshDashboard()">
-        Actualiser
-      </button>
-    </section>
+<div class="counter-nav">
 
-    <section class="history-card">
-      <div class="history-head">
-        <h3>Données par mécano</h3>
-      </div>
+<button class="counter-arrow" onclick="previousDay()">◀</button>
 
-      <div id="mechanicsList" class="history-list">
-        <div class="empty-state">Aucune donnée pour le moment</div>
-      </div>
-    </section>
-  </div>
+<div class="counter-center">
 
-  <div id="scannerModal" class="scanner-modal hidden">
-    <div class="scanner-flash-layer"></div>
+<div class="main-counter-label">Vélos à déployer aujourd'hui</div>
 
-    <div class="scanner-sheet">
-      <div class="scanner-head">
-        <h3>Scanner pour contrôle</h3>
-        <button class="scanner-close" onclick="closeScanner()">Fermer</button>
-      </div>
+<div class="main-counter-number" id="validatedMainCount">0</div>
 
-      <p class="scanner-help">Scanne le QR du vélo en zone de contrôle.</p>
+<div class="counter-date" id="dashboardDate">-</div>
 
-      <div id="qr-reader" class="qr-reader-box"></div>
+</div>
 
-      <button id="torchButton" class="torch-btn" onclick="toggleTorch()">
-        💡 Allumer la lampe
-      </button>
+<button class="counter-arrow" onclick="nextDay()">▶</button>
 
-      <div id="scanStatus" class="scan-status">Caméra en attente...</div>
-    </div>
-  </div>
+</div>
 
-  <div id="decisionModal" class="scanner-modal hidden">
-    <div class="scanner-sheet">
-      <div class="scanner-head">
-        <h3>Décision contrôle</h3>
-        <button class="scanner-close" onclick="closeDecisionModal()">Fermer</button>
-      </div>
+</section>
 
-      <div class="decision-card">
-        <p class="decision-label">Vélo</p>
-        <div class="decision-value" id="decisionBikeId">-</div>
 
-        <p class="decision-label">Réparé par</p>
-        <div class="decision-subvalue" id="decisionMechanicName">-</div>
+<section class="stats-row">
 
-        <p class="decision-label">Type réparation</p>
-        <div class="decision-subvalue" id="decisionRepairType">-</div>
+<div class="stat-card">
+<div class="stat-title">HARD validés</div>
+<div class="stat-value" id="hardCount">0</div>
+<div class="stat-percent" id="hardPercent">0%</div>
+</div>
 
-        <p class="decision-label">Scanné à</p>
-        <div class="decision-subvalue" id="decisionCreatedAt">-</div>
-      </div>
+<div class="stat-card">
+<div class="stat-title">EASY/MEDIUM validés</div>
+<div class="stat-value" id="easyCount">0</div>
+<div class="stat-percent" id="easyPercent">0%</div>
+</div>
 
-      <textarea
-        id="returnComment"
-        class="login-input decision-textarea"
-        placeholder="Commentaire optionnel"
-      ></textarea>
+</section>
 
-      <div class="decision-actions">
-        <button class="primary-action" onclick="validateQc()">Valider</button>
-        <button class="danger-action" onclick="returnQc()">Retour réparation</button>
-      </div>
 
-      <div id="decisionStatus" class="scan-status">Choisis une décision.</div>
-    </div>
-  </div>
+<section class="stats-grid-2x2">
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
-  <script src="./js/config.js?v=32"></script>
-  <script src="./js/manager.js?v=32"></script>
+<div class="stat-card">
+<div class="stat-title">À contrôler</div>
+<div class="stat-value" id="pendingCount">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">Contrôlés</div>
+<div class="stat-value" id="controlledCount">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">Retournés</div>
+<div class="stat-value" id="returnedCount">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">Mécanos actifs</div>
+<div class="stat-value" id="mechanicsCount">0</div>
+</div>
+
+</section>
+
+
+<button class="primary-action" onclick="openScanner()">
+Scanner QC
+</button>
+
+<button class="secondary-action" onclick="refreshDashboard()">
+Actualiser
+</button>
+
+
+<h3>Données par mécano</h3>
+
+<div id="mechanicsList"></div>
+
+
+</div>
+
+
+<script src="./js/config.js?v=40"></script>
+<script src="./js/manager.js?v=40"></script>
+
 </body>
 </html>
